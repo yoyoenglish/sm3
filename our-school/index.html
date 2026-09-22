@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our school — Super Minds 3</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎒</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1D2A5B; --paper:#FFFFFF; --bg:#EAF1FA; --line:#C9D6EA; --sun:#FFC83D; --ok:#2E9E5B; --bad:#D6453D; --muted:#5A6788;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --ink:#E9EEFA; --paper:#1E2640; --bg:#141A2E; --line:#34406A; --muted:#A5B0D0; }
+}
+:root[data-theme="dark"]{ --ink:#E9EEFA; --paper:#1E2640; --bg:#141A2E; --line:#34406A; --muted:#A5B0D0; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.4}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+header h1{font-size:clamp(34px,7vw,52px);line-height:1;margin:8px 0 4px;font-weight:800}
+header p{margin:0 0 18px;color:var(--muted)}
+/* timetable strip = hero */
+.timetable{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:22px}
+.timetable span{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font-size:clamp(16px,4vw,26px);background:var(--c);transition:transform .2s}
+.timetable span.done{outline:3px solid var(--ink);outline-offset:-3px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+nav button{font:inherit;font-weight:700;border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:6px 16px;border-radius:999px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+section[hidden]{display:none}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:22px}
+/* flashcards */
+.card{border-radius:14px;background:var(--c);color:#1D2A5B;padding:26px 20px;text-align:center;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;user-select:none}
+.card .emo{font-size:64px;line-height:1}
+.card .word{font-size:clamp(40px,10vw,60px);font-weight:800;line-height:1}
+.card .def{font-size:21px;max-width:30ch}
+.card .hint{font-size:15px;opacity:.7}
+.row{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:10px 18px;background:var(--ink);color:var(--bg);cursor:pointer;min-width:52px}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.sound{background:var(--sun);color:#1D2A5B}
+.count{color:var(--muted);font-weight:700}
+/* quiz */
+.q{font-size:clamp(22px,5vw,28px);font-weight:700;margin:0 0 16px;line-height:1.3}
+.q .gap{display:inline-block;min-width:4.5em;border-bottom:3px solid var(--ink);text-align:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{font:inherit;font-size:22px;font-weight:700;padding:14px 10px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.opt.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.status{display:flex;justify-content:space-between;color:var(--muted);font-weight:700;margin-bottom:12px}
+.feedback{min-height:1.6em;margin-top:12px;font-weight:700;text-align:center}
+/* spell */
+.spell-emo{font-size:72px;text-align:center;line-height:1}
+.spell-def{text-align:center;font-size:20px;margin:8px 0 14px}
+.spell-in{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.spell-in input{font:inherit;font-size:26px;font-weight:700;padding:8px 14px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:min(260px,100%);text-align:center}
+.done-box{text-align:center}
+.done-box .big{font-size:64px}
+@media (max-width:420px){.opts{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Our school</h1>
+    <p>Super Minds 3 · Unit 1 · School subjects</p>
+  </header>
+  <div class="timetable" id="tt" aria-hidden="true"></div>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="cards">Cards</button>
+    <button role="tab" aria-selected="false" data-tab="quiz">Which lesson?</button>
+    <button role="tab" aria-selected="false" data-tab="spell">Spell it</button>
+  </nav>
+
+  <section id="cards" class="panel">
+    <div class="card" id="card" tabindex="0" role="button" aria-label="Flip card"></div>
+    <div class="row">
+      <button class="btn alt" id="prev" aria-label="Previous">◀</button>
+      <button class="btn sound" id="say" aria-label="Listen">🔊 Listen</button>
+      <button class="btn alt" id="next" aria-label="Next">▶</button>
+    </div>
+    <div class="row"><span class="count" id="cardCount"></span></div>
+  </section>
+
+  <section id="quiz" class="panel" hidden></section>
+  <section id="spell" class="panel" hidden></section>
+</div>
+
+<script>
+const SUBJECTS = [
+  {w:"English",   say:"English",   e:"🔤", c:"#FFD66B", d:"In English we read stories, learn new words and play games."},
+  {w:"Maths",     say:"Maths",     e:"➕", c:"#8FD3FF", d:"In Maths we count and solve number problems: 1 + 1 = 2."},
+  {w:"Geography", say:"Geography", e:"🗺️", c:"#A8E6A1", d:"In Geography we look at maps and read about countries."},
+  {w:"Science",   say:"Science",   e:"🔬", c:"#C9B6FF", d:"In Science we do experiments."},
+  {w:"I.T.",      say:"I T",       e:"💻", c:"#9FE3DA", d:"In I.T. we learn about computers."},
+  {w:"Music",     say:"Music",     e:"🎵", c:"#FFB3C7", d:"In Music we sing songs and play instruments."},
+  {w:"Art",       say:"Art",       e:"🎨", c:"#FFC49B", d:"In Art we draw and paint pictures."},
+  {w:"P.E.",      say:"P E",       e:"⚽", c:"#B9E07A", d:"In P.E. we do sport and play football."},
+  {w:"History",   say:"History",   e:"🏛️", c:"#E3C9A8", d:"In History we learn about the past."}
+];
+
+/* ---------- audio ---------- */
+let voice = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>v.lang==="en-GB") || vs.find(v=>v.lang&&v.lang.startsWith("en")) || null;
+}
+if ("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB"; u.rate = 0.85; if (voice) u.voice = voice;
+  speechSynthesis.speak(u);
+}
+const sentence = s => s.d.replace(/[0-9+=]/g,"").replace(/:\s*$/,"").replace(s.w, s.say);
+
+/* ---------- timetable strip ---------- */
+const tt = document.getElementById("tt");
+SUBJECTS.forEach((s,i)=>{ const b=document.createElement("span"); b.style.setProperty("--c",s.c); b.textContent=s.e; b.id="tt"+i; tt.appendChild(b); });
+function markDone(i){ document.getElementById("tt"+i).classList.add("done"); }
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
+  ["cards","quiz","spell"].forEach(id=>document.getElementById(id).hidden = id!==b.dataset.tab);
+  if (b.dataset.tab==="quiz") startQuiz();
+  if (b.dataset.tab==="spell") startSpell();
+}));
+
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+/* ---------- cards ---------- */
+let ci = 0, flipped = false;
+const cardEl = document.getElementById("card");
+function renderCard(){
+  const s = SUBJECTS[ci];
+  cardEl.style.setProperty("--c", s.c);
+  cardEl.innerHTML = flipped
+    ? `<div class="emo">${s.e}</div><div class="def">${s.d}</div><div class="hint">tap to flip</div>`
+    : `<div class="emo">${s.e}</div><div class="word">${s.w}</div><div class="hint">tap to see what we do</div>`;
+  document.getElementById("cardCount").textContent = `${ci+1} / ${SUBJECTS.length}`;
+}
+function sayCard(){ const s=SUBJECTS[ci]; speak(flipped ? sentence(s) : s.say); }
+function flip(){ flipped=!flipped; renderCard(); sayCard(); markDone(ci); }
+cardEl.addEventListener("click", flip);
+cardEl.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();} });
+document.getElementById("say").onclick = sayCard;
+document.getElementById("next").onclick = ()=>{ ci=(ci+1)%SUBJECTS.length; flipped=false; renderCard(); sayCard(); };
+document.getElementById("prev").onclick = ()=>{ ci=(ci-1+SUBJECTS.length)%SUBJECTS.length; flipped=false; renderCard(); sayCard(); };
+renderCard();
+
+/* ---------- quiz: which lesson? ---------- */
+const quizEl = document.getElementById("quiz");
+let qOrder, qi, qScore;
+function startQuiz(){ qOrder = shuffle(SUBJECTS); qi = 0; qScore = 0; showQ(); }
+function showQ(){
+  if (qi >= qOrder.length){
+    quizEl.innerHTML = `<div class="done-box"><div class="big">${qScore===qOrder.length?"🏆":"⭐"}</div>
+      <p class="q">${qScore} / ${qOrder.length}</p>
+      <button class="btn" id="qAgain">Play again</button></div>`;
+    document.getElementById("qAgain").onclick = startQuiz; return;
+  }
+  const s = qOrder[qi];
+  const opts = shuffle([s, ...shuffle(SUBJECTS.filter(x=>x!==s)).slice(0,3)]);
+  const text = s.d.replace(s.w, '<span class="gap">?</span>');
+  quizEl.innerHTML = `<div class="status"><span>Question ${qi+1} / ${qOrder.length}</span><span>⭐ ${qScore}</span></div>
+    <p class="q">${text}</p>
+    <div class="opts">${opts.map(o=>`<button class="opt" data-w="${o.w}"><span aria-hidden="true">${o.e}</span>${o.w}</button>`).join("")}</div>
+    <div class="feedback" id="qfb" aria-live="polite"></div>`;
+  quizEl.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const ok = b.dataset.w===s.w;
+    quizEl.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(x.dataset.w===s.w) x.classList.add("right"); });
+    if(!ok) b.classList.add("wrong"); else { qScore++; markDone(SUBJECTS.indexOf(s)); }
+    quizEl.querySelector(".gap").textContent = s.w;
+    document.getElementById("qfb").textContent = ok ? "Well done!" : `It's ${s.w}.`;
+    speak(sentence(s));
+    setTimeout(()=>{ qi++; showQ(); }, 2200);
+  });
+}
+
+/* ---------- spell it ---------- */
+const spellEl = document.getElementById("spell");
+let sOrder, si, sScore, tries;
+const norm = t => t.toLowerCase().replace(/[^a-z]/g,"");
+function startSpell(){ sOrder = shuffle(SUBJECTS); si = 0; sScore = 0; showS(); }
+function showS(){
+  if (si >= sOrder.length){
+    spellEl.innerHTML = `<div class="done-box"><div class="big">${sScore===sOrder.length?"🏆":"⭐"}</div>
+      <p class="q">${sScore} / ${sOrder.length}</p>
+      <button class="btn" id="sAgain">Play again</button></div>`;
+    document.getElementById("sAgain").onclick = startSpell; return;
+  }
+  const s = sOrder[si]; tries = 0;
+  spellEl.innerHTML = `<div class="status"><span>Word ${si+1} / ${sOrder.length}</span><span>⭐ ${sScore}</span></div>
+    <div class="spell-emo" aria-hidden="true">${s.e}</div>
+    <p class="spell-def">${s.d.replace(s.w,"…")}</p>
+    <div class="spell-in">
+      <button class="btn sound" id="sSay" aria-label="Listen">🔊</button>
+      <input id="sIn" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the subject">
+      <button class="btn" id="sCheck">Check</button>
+    </div>
+    <div class="feedback" id="sfb" aria-live="polite"></div>`;
+  const inp = document.getElementById("sIn");
+  document.getElementById("sSay").onclick = ()=>speak(s.say);
+  const check = ()=>{
+    if (!inp.value.trim()) return;
+    const fb = document.getElementById("sfb");
+    if (norm(inp.value)===norm(s.w)){
+      if (tries===0) sScore++;
+      markDone(SUBJECTS.indexOf(s));
+      fb.style.color="var(--ok)"; fb.textContent = `Yes! ${s.w}`; speak(s.say);
+      inp.disabled = true; document.getElementById("sCheck").disabled = true;
+      setTimeout(()=>{ si++; showS(); }, 1500);
+    } else {
+      tries++;
+      fb.style.color="var(--bad)";
+      fb.textContent = tries>=2 ? `It's ${s.w}. Type it!` : `Try again. It starts with "${s.w[0]}".`;
+      inp.select();
+    }
+  };
+  document.getElementById("sCheck").onclick = check;
+  inp.addEventListener("keydown", e=>{ if(e.key==="Enter") check(); });
+  inp.focus();
+}
+</script>
+</body>
+</html>
