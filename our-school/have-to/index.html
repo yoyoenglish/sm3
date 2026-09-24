@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>have to / has to — тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2F6BFF;--blue-l:#E3ECFF;--orange:#FF8A1F;--orange-l:#FFEEDC;
+  --pink:#F2456B;--pink-l:#FFE4EA;--purple:#8A4DFF;--purple-l:#EEE5FF;
+  --green:#1C9A55;--green-l:#DDF5E7;--sun:#FFD43B;--sun-l:#FFF6CF;
+  --text:#22253A;--soft:#6B6F86;--line:#E6E8F0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"Nunito",system-ui,sans-serif;color:var(--text);background:#F5F7FF;min-height:100vh;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 40px}
+
+/* header */
+header{display:flex;align-items:center;gap:14px;padding:6px 2px 14px}
+header svg{width:64px;flex:none}
+.tag{display:inline-block;background:var(--sun);font-weight:800;font-size:13px;padding:3px 12px;border-radius:99px}
+h1{font-weight:900;font-size:clamp(30px,7vw,44px);line-height:1.05;color:var(--blue);margin-top:4px}
+h1 span{color:var(--orange)}
+
+/* tabs */
+nav{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+@media (min-width:600px){nav{flex-wrap:wrap;overflow:visible}}
+nav button{flex:none;background:#fff;border:2px solid var(--line);border-radius:99px;padding:9px 16px;font-weight:800;font-size:15px}
+nav button[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+nav button .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sun);color:var(--text);font-size:12px;margin-right:6px}
+nav button[aria-selected="true"] .n{background:#fff}
+
+.panel{display:none}.panel.on{display:block}
+.card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 2px 0 var(--line)}
+.card+.card{margin-top:14px}
+h2{font-weight:900;font-size:24px;line-height:1.15}
+.lead{color:var(--soft);font-weight:700;font-size:16px;margin-top:4px}
+
+/* rule */
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.rb{border-radius:18px;padding:14px}
+.rb .who{display:inline-block;color:#fff;font-weight:800;font-size:14px;padding:2px 10px;border-radius:99px}
+.rb .f{font-weight:900;font-size:24px;margin-top:6px}
+.rb .ex{font-weight:700;font-size:16px;margin-top:4px}
+.rb.b{background:var(--blue-l)}.rb.b .who{background:var(--blue)}.rb.b .f{color:var(--blue)}
+.rb.o{background:var(--orange-l)}.rb.o .who{background:var(--orange)}.rb.o .f{color:var(--orange)}
+.rb.p{background:var(--pink-l)}.rb.p .f{color:var(--pink)}
+.rb.v{background:var(--purple-l)}.rb.v .f{color:var(--purple)}
+.rb .f small{font-size:14px;color:var(--soft);font-weight:700}
+.one-s{margin-top:12px;background:var(--sun);border-radius:18px;padding:14px 16px;font-weight:800;font-size:17px}
+.one-s mark{background:#fff;color:var(--orange);border-radius:4px;padding:0 2px}
+.go{margin-top:16px;display:inline-block;background:var(--blue);color:#fff;font-weight:900;font-size:17px;padding:12px 22px;border-radius:99px}
+
+/* quiz */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.count{font-weight:800;color:var(--soft);font-size:15px;white-space:nowrap}
+.bar{height:10px;background:var(--line);border-radius:99px;margin:12px 0 18px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .3s}
+.q{font-weight:800;font-size:clamp(22px,5.2vw,30px);line-height:1.3;text-align:center;padding:10px 0 4px}
+.q .gap{display:inline-block;min-width:74px;border-bottom:4px solid var(--purple);color:var(--purple);text-align:center}
+.q .gap.ok{color:var(--green);border-color:var(--green)}.q .gap.bad{color:var(--pink);border-color:var(--pink)}
+.hint{text-align:center;color:var(--soft);font-weight:700;font-size:15px}
+.q .vb{color:var(--purple);font-weight:700;font-size:.8em}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px}
+.opts button{background:var(--blue-l);border:3px solid transparent;border-radius:18px;padding:14px 10px;font-weight:900;font-size:21px;color:var(--blue)}
+.opts button.ok{background:var(--green-l);border-color:var(--green);color:var(--green)}
+.opts button.bad{background:var(--pink-l);border-color:var(--pink);color:var(--pink)}
+.opts button:disabled{cursor:default}
+.fb{margin-top:16px;border-radius:18px;padding:14px 16px;font-weight:700;font-size:16px;line-height:1.4;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--green-l)}.fb.bad{background:var(--pink-l)}
+.fb b.t{display:block;font-size:19px;font-weight:900;margin-bottom:2px}
+.fb.ok b.t{color:var(--green)}.fb.bad b.t{color:var(--pink)}
+.funny{margin-top:8px;background:#fff;border-radius:14px;padding:10px 12px;font-weight:800;font-size:17px}
+.funny small{display:block;font-size:13px;color:var(--soft);font-weight:700}
+.say{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:99px;padding:5px 12px;font-weight:800;font-size:14px;margin-top:10px;color:var(--blue)}
+.say svg{width:18px;height:18px}
+.next{display:block;margin:16px auto 0;background:var(--purple);color:#fff;font-weight:900;font-size:18px;padding:13px 30px;border-radius:99px}
+.hidden{display:none!important}
+
+/* typing */
+.type-row{display:flex;gap:10px;margin-top:18px}
+.type-row input{flex:1;min-width:0;font:inherit;font-weight:800;font-size:20px;border:3px solid var(--line);border-radius:16px;padding:12px 14px;background:#fff;color:var(--text)}
+.type-row input.ok{border-color:var(--green)}.type-row input.bad{border-color:var(--pink)}
+.type-row button{background:var(--purple);color:#fff;font-weight:900;font-size:17px;padding:0 20px;border-radius:16px}
+
+/* result */
+.result{text-align:center;padding:10px 0}
+.result .big{font-size:54px;font-weight:900;color:var(--blue);line-height:1}
+.result .stars{font-size:40px;letter-spacing:4px;margin:8px 0}
+.result p{font-weight:800;font-size:18px}
+
+/* mistakes gallery */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px}
+.mc{border:3px solid var(--pink-l);border-radius:22px;padding:16px;background:#fff}
+.mc .kind{display:inline-block;background:var(--pink);color:#fff;font-weight:800;font-size:13px;padding:3px 10px;border-radius:99px}
+.mc .wrong{font-weight:900;font-size:21px;margin-top:10px;color:var(--pink);text-decoration:line-through;text-decoration-thickness:3px}
+.mc .sounds{margin-top:8px;background:var(--sun-l);border-radius:14px;padding:10px 12px;font-weight:800;font-size:17px}
+.mc .sounds small{display:block;font-size:13px;color:var(--soft)}
+.mc .why{margin-top:8px;font-weight:700;color:var(--soft);font-size:15px}
+.mc .right{margin-top:8px;font-weight:900;font-size:20px;color:var(--green);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mc .right .say{margin-top:0}
+.sub-h{margin-top:22px}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.tf button{border-radius:18px;padding:14px;font-weight:900;font-size:19px;border:3px solid transparent}
+.tf .t{background:var(--green-l);color:var(--green)}.tf .f{background:var(--pink-l);color:var(--pink)}
+.tf button.pick{border-color:currentColor}
+.tf button:disabled{opacity:.55;cursor:default}.tf button.pick:disabled{opacity:1}
+
+@media (max-width:520px){
+  .rule-grid{grid-template-columns:1fr}
+  .wrap{padding:12px 12px 32px}
+  .card{padding:16px;border-radius:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg viewBox="0 0 120 130" aria-hidden="true">
+      <path d="M40 30 Q40 8 60 8 Q80 8 80 30" fill="none" stroke="#1F4FD0" stroke-width="7" stroke-linecap="round"/>
+      <rect x="18" y="26" width="84" height="96" rx="26" fill="#2F6BFF"/>
+      <rect x="30" y="80" width="60" height="32" rx="12" fill="#FF8A1F"/>
+      <rect x="52" y="84" width="16" height="5" rx="2.5" fill="#FFD43B"/>
+      <circle cx="45" cy="54" r="9" fill="#fff"/><circle cx="75" cy="54" r="9" fill="#fff"/>
+      <circle cx="47" cy="56" r="4.5" fill="#22253A"/><circle cx="77" cy="56" r="4.5" fill="#22253A"/>
+      <path d="M50 68 Q60 76 70 68" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="35" cy="68" r="4" fill="#FF9AB1" opacity=".8"/><circle cx="85" cy="68" r="4" fill="#FF9AB1" opacity=".8"/>
+    </svg>
+    <div>
+      <span class="tag">Super Minds 3, Unit 1 «Our school»</span>
+      <h1>have to / <span>has to</span></h1>
+    </div>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" data-tab="rule" aria-selected="true"><span class="n">1</span>Правило</button>
+    <button role="tab" data-tab="hh" aria-selected="false"><span class="n">2</span>have или has?</button>
+    <button role="tab" data-tab="dd" aria-selected="false"><span class="n">3</span>Нет и вопрос</button>
+    <button role="tab" data-tab="ty" aria-selected="false"><span class="n">4</span>Допиши</button>
+    <button role="tab" data-tab="mi" aria-selected="false"><span class="n">5</span>Смешные ошибки</button>
+  </nav>
+
+  <!-- 1. Rule -->
+  <section class="panel on" id="rule">
+    <div class="card">
+      <h2>have to = надо, должен</h2>
+      <p class="lead">Так говорим о правилах в школе и дома. После <b>to</b> всегда идёт глагол.</p>
+      <div class="rule-grid">
+        <div class="rb b"><span class="who">I, you, we, they</span><div class="f">have to <small>+ глагол</small></div><div class="ex">We have to wear a uniform.</div></div>
+        <div class="rb o"><span class="who">he, she, it</span><div class="f">has to <small>+ глагол</small></div><div class="ex">She has to read a book.</div></div>
+        <div class="rb p"><div class="f">don’t / doesn’t have to</div><div class="ex">= не надо, не обязательно (а не «нельзя»!)</div><div class="ex">He doesn’t have to run.</div></div>
+        <div class="rb v"><div class="f">Do / Does … have to?</div><div class="ex">Do you have to do homework?<br>Yes, I do. / No, I don’t.</div></div>
+      </div>
+      <div class="one-s">Запомни: «s» только одна! &nbsp; He ha<mark>s</mark> to go. &nbsp; Doe<mark>s</mark> he have to go?</div>
+      <button class="go" data-goto="hh">Начать тренировку</button>
+    </div>
+  </section>
+
+  <section class="panel" id="hh"><div class="card" data-quiz="hh"></div></section>
+  <section class="panel" id="dd"><div class="card" data-quiz="dd"></div></section>
+  <section class="panel" id="ty"><div class="card" data-type="ty"></div></section>
+
+  <!-- 5. Mistakes -->
+  <section class="panel" id="mi">
+    <div class="card">
+      <h2>Смешные ошибки</h2>
+      <p class="lead">Посмотри, как звучат ошибки, если перевести их по-честному. Не повторяй!</p>
+      <div class="mgrid" id="gallery"></div>
+    </div>
+    <div class="card sub-h" data-tf="tf"></div>
+  </section>
+</div>
+
+<script>
+/* ---------- speech ---------- */
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+let voice=null;
+function pickVoice(){ if(!('speechSynthesis' in window))return; const v=speechSynthesis.getVoices();
+  voice=v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null; }
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function say(text){ if(!('speechSynthesis' in window))return; speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang=voice?voice.lang:'en-GB'; if(voice)u.voice=voice; u.rate=.85; speechSynthesis.speak(u); }
+function sayBtn(text){ return `<button class="say" data-say="${text.replace(/"/g,'&quot;')}">${SPK}Послушать</button>`; }
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]'); if(b) say(b.dataset.say);});
+
+/* ---------- tabs ---------- */
+function openTab(id){ document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===id)); window.scrollTo({top:0});
+  const t=document.querySelector(`nav button[data-tab="${id}"]`); if(t&&t.scrollIntoView)t.scrollIntoView({block:'nearest',inline:'center'}); }
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>openTab(b.dataset.tab));
+document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>openTab(b.dataset.goto));
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function stars(score,total){const r=score/total;return r>=.9?'⭐⭐⭐':r>=.6?'⭐⭐':'⭐';}
+function praise(score,total){const r=score/total;return r===1?'Идеально! Ты мастер have to!':r>=.7?'Отлично! Ещё чуть-чуть до идеала.':'Хорошее начало! Попробуй ещё раз.';}
+
+/* ---------- data ---------- */
+const HH=[
+ {s:'I ___ to wear a uniform.',a:'have',why:'I → have'},
+ {s:'She ___ to get up at seven.',a:'has',why:'she → has'},
+ {s:'We ___ to do our homework.',a:'have',why:'we → have'},
+ {s:'Tom ___ to read one book a week.',a:'has',why:'Tom = he → has'},
+ {s:'They ___ to arrive at eight.',a:'have',why:'they → have'},
+ {s:'My dad ___ to go to work.',a:'has',why:'my dad = he → has'},
+ {s:'You ___ to wash your hands.',a:'have',why:'you → have'},
+ {s:'The dog ___ to go for a walk.',a:'has',why:'the dog = it → has'},
+ {s:'Lily and Ben ___ to bring their lunch.',a:'have',why:'Lily and Ben = they → have'},
+ {s:'Mum ___ to cook dinner.',a:'has',why:'Mum = she → has'},
+];
+const DD=[
+ {s:'I ___ have to wear a tie.',o:['don’t','doesn’t'],a:'don’t',why:'I → don’t'},
+ {s:'He ___ have to go to a club.',o:['don’t','doesn’t'],a:'doesn’t',why:'he → doesn’t'},
+ {s:'___ you have to do homework every day?',o:['Do','Does'],a:'Do',why:'you → Do'},
+ {s:'___ she have to get up early?',o:['Do','Does'],a:'Does',why:'she → Does'},
+ {s:'We ___ have to bring our lunch.',o:['don’t','doesn’t'],a:'don’t',why:'we → don’t'},
+ {s:'___ they have to wear a uniform?',o:['Do','Does'],a:'Do',why:'they → Do'},
+ {s:'Anna ___ have to walk to school.',o:['don’t','doesn’t'],a:'doesn’t',why:'Anna = she → doesn’t'},
+ {s:'___ Tom have to tidy his room?',o:['Do','Does'],a:'Does',why:'Tom = he → Does'},
+ {s:'Do you have to read every day? — Yes, I ___.',o:['do','does'],a:'do',why:'Do you…? → Yes, I do.'},
+ {s:'Does he have to cook? — No, he ___.',o:['don’t','doesn’t'],a:'doesn’t',why:'Does he…? → No, he doesn’t.'},
+];
+/* typing: no hints; several verbs accepted where the sentence allows it */
+const TY=[
+ {pre:'I',post:'football.',ans:'have to play',obj:['football'],
+  verbs:[{v:'play',ru:'Я должен играть в футбол.',ing:'Я должен играние футбола 🤪'},
+         {v:'watch',ru:'Я должен смотреть футбол.',ing:'Я должен смотрение футбола 🤪'}],
+  noTo:'Я имею играть футбол 🤔',noVerb:'Я должен футбол… Что с ним сделать? Съесть? 🍽️',sF:'Я должен играет в футбол 🤖',agF:'Я должна… ой, кто? 😵'},
+ {pre:'She',post:'a uniform.',ans:'has to wear',obj:['a','uniform'],
+  verbs:[{v:'wear',ru:'Она должна носить форму.',ing:'Она должна ношение формы 🤪'}],
+  noTo:'Она имеет носить форму 🤔',noVerb:'Она должна форму… Кому? Шкафу? 👗',sF:'Она должна носит форму 🤖',agF:'Она должны носить форму 😵'},
+ {pre:'We',post:'our homework.',ans:'have to do',obj:['our','homework'],
+  verbs:[{v:'do',ru:'Мы должны делать домашку.',ing:'Мы должны делание домашки 🤪'},
+         {v:'finish',ru:'Мы должны закончить домашку.',ing:'Мы должны заканчивание домашки 🤪'}],
+  noTo:'Мы имеем делать домашку 🤔',noVerb:'Мы должны нашу домашку… Покормить её? 🐶',sF:'Мы должны делает домашку 🤖',agF:'Мы должен делать домашку 😵'},
+ {pre:'He',post:'to school.',ans:'has to walk',obj:['to','school'],
+  verbs:[{v:'walk',ru:'Он должен ходить в школу пешком.',ing:'Он должен хождение в школу 🤪'},
+         {v:'go',ru:'Он должен идти в школу.',ing:'Он должен идение в школу 🤪'},
+         {v:'run',ru:'Он должен бежать в школу.',ing:'Он должен бегание в школу 🤪'},
+         {v:'cycle',ru:'Он должен ездить в школу на велосипеде.',ing:'Он должен велосипедение в школу 🤪'},
+         {v:'ride',ru:'Он должен ехать в школу.',ing:'Он должен езжение в школу 🤪'}],
+  noTo:'Он имеет ходить в школу 🤔',noVerb:'Он должен в школу… Прилететь? На драконе? 🐉',sF:'Он должен ходит в школу 🤖',agF:'Он должны ходить в школу 😵'},
+ {pre:'They',post:'early.',ans:'have to get up',obj:['early'],
+  verbs:[{v:'get up',ru:'Им надо вставать рано.',ing:'Они должны вставание рано 🤪'},
+         {v:'wake up',ru:'Им надо просыпаться рано.',ing:'Они должны просыпание рано 🤪'},
+         {v:'go to bed',ru:'Им надо ложиться спать рано.',ing:'Они должны ложение спать рано 🤪'},
+         {v:'leave',ru:'Им надо уходить рано.',ing:'Они должны уходение рано 🤪'}],
+  noTo:'Они имеют вставать рано 🤔',noVerb:'Они должны рано… Что рано? Храпеть? 😴',sF:'Им надо встаёт рано 🤖',agF:'Они должен вставать рано 😵'},
+ {pre:'Mia',post:'her room.',ans:'has to tidy',obj:['her','room'],
+  verbs:[{v:'tidy',ru:'Мия должна убрать свою комнату.',ing:'Мия должна убирание комнаты 🤪'},
+         {v:'clean',ru:'Мия должна почистить свою комнату.',ing:'Мия должна чищение комнаты 🤪'}],
+  noTo:'Мия имеет убирать комнату 🤔',noVerb:'Мия должна свою комнату… Продать? 🏷️',sF:'Мия должна убирает комнату 🤖',agF:'Мия должны убрать комнату 😵'},
+];
+const GALLERY=[
+ {k:'Глагол с -ing',w:'I have to playing football.',s:'«Я должен играние футбола»',why:'После to — просто глагол, без -ing.',r:'I have to play football.'},
+ {k:'Потерялось to',w:'I have play football.',s:'«Я имею играть футбол»',why:'Без to слово have значит «иметь». Не теряй to!',r:'I have to play football.'},
+ {k:'Нет глагола',w:'I have to school.',s:'«Я должен в школу… и что там? Спать? Танцевать?»',why:'После to нужен глагол: что именно надо делать?',r:'I have to go to school.'},
+ {k:'have вместо has',w:'She have to go.',s:'«Она должны идти»',why:'he, she, it → has.',r:'She has to go.'},
+ {k:'Лишняя -s',w:'He has to goes.',s:'«Он должен идёт»',why:'«s» только одна: она уже в has.',r:'He has to go.'},
+ {k:'Две «s»',w:'Does he has to go?',s:'«Должен ли он должен идти?»',why:'Есть does? Дальше только have.',r:'Does he have to go?'},
+ {k:'don’t have to ≠ нельзя',w:'You don’t have to run in the corridor.',s:'«Бегать по коридору не обязательно… но можно!» 🏃',why:'don’t have to = не обязательно. Это НЕ запрет.',r:'You can’t run in the corridor.'},
+];
+const TF=[
+ {s:'I have to playing tennis.',ok:false,f:'«Я должен теннисное играние» 🤪',r:'I have to play tennis.'},
+ {s:'She has to wear a uniform.',ok:true},
+ {s:'We have go to school.',ok:false,f:'«Мы имеем идти в школу» 🤔',r:'We have to go to school.'},
+ {s:'He has to school.',ok:false,f:'«Он должен школу… Съесть её?» 🍽️',r:'He has to go to school.'},
+ {s:'Do you have to read every day?',ok:true},
+ {s:'Tom have to walk to school.',ok:false,f:'«Том должны идти в школу» 😵',r:'Tom has to walk to school.'},
+ {s:'She has to cooks dinner.',ok:false,f:'«Она должна готовит ужин» 🤖',r:'She has to cook dinner.'},
+ {s:'They don’t have to bring lunch.',ok:true},
+ {s:'Does he has to get up early?',ok:false,f:'«Должен ли он должен вставать рано?» 🙃',r:'Does he have to get up early?'},
+ {s:'I have to doing my homework.',ok:false,f:'«Я должен делание домашки» 🤪',r:'I have to do my homework.'},
+ {s:'Mia has to tidy her room.',ok:true},
+ {s:'I have to the park.',ok:false,f:'«Я должен парк… Купить его? Подарить?» 🎁',r:'I have to go to the park.'},
+];
+
+/* ---------- choice quiz ---------- */
+function choiceQuiz(el,data,opts,title,lead){
+  let list,i,score;
+  function start(){list=shuffle(data);i=0;score=0;show();}
+  function show(){
+    if(i>=list.length) return finish();
+    const it=list[i], options=it.o||opts;
+    el.innerHTML=`<div class="top"><h2>${title}</h2><span class="count">${i+1} из ${list.length}</span></div>
+      <p class="lead">${lead}</p><div class="bar"><i style="width:${i/list.length*100}%"></i></div>
+      <div class="q">${it.s.replace('___','<span class="gap">&nbsp;?&nbsp;</span>')}</div>
+      <div class="opts">${options.map(o=>`<button data-o="${o}">${o}</button>`).join('')}</div>
+      <div class="fb"></div><button class="next hidden">Дальше</button>`;
+    el.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>answer(b,it));
+  }
+  function answer(b,it){
+    const ok=b.dataset.o===it.a, gap=el.querySelector('.gap'), full=it.s.replace('___',it.a);
+    el.querySelectorAll('.opts button').forEach(x=>{x.disabled=true; if(x.dataset.o===it.a)x.classList.add('ok');});
+    if(!ok)b.classList.add('bad'); else score++;
+    gap.textContent=it.a; gap.classList.add(ok?'ok':'bad');
+    const fb=el.querySelector('.fb'); fb.className='fb show '+(ok?'ok':'bad');
+    fb.innerHTML=`<b class="t">${ok?'Верно! 🎉':'Ой, не так 🙈'}</b>${it.why}${sayBtn(full)}`;
+    const n=el.querySelector('.next'); n.classList.remove('hidden'); n.onclick=()=>{i++;show();}; n.focus();
+  }
+  function finish(){
+    el.innerHTML=`<div class="result"><h2>${title}</h2><div class="stars">${stars(score,list.length)}</div>
+      <div class="big">${score} / ${list.length}</div><p>${praise(score,list.length)}</p>
+      <button class="next">Ещё раз</button></div>`;
+    el.querySelector('.next').onclick=start;
+  }
+  start();
+}
+
+/* ---------- typing with funny mistakes ---------- */
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/[.,!?;:]/g,' ').replace(/\s+/g,' ').trim();
+const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function diagnose(input,it){
+  const t=norm(input), need=it.ans.split(' ')[0], post=norm(it.post);
+  if(!t) return {type:'empty'};
+  const m=t.match(/\b(have|has)\b(.*)$/);
+  let rest=m?m[2].trim():'';
+  if(post && rest.endsWith(' '+post)) rest=rest.slice(0,-post.length).trim();   // whole sentence typed
+  else if(post && rest.endsWith(post) && rest!==post) rest=rest.slice(0,-post.length).trim();
+  const hv=m?m[1]:null, pre=norm(it.pre);
+  if(m && hv===need && /^to\b/.test(rest)){
+    const after=rest.replace(/^to\s*/,'');
+    const hit=[it.verbs[0]].find(x=>after===x.v);
+    const before=t.slice(0,m.index).trim();
+    if(hit && (before===''||before===pre)) return {type:'ok',verb:hit};
+  }
+  const ingW=(t.match(/\b(\w+)ing\b/)||[])[0];
+  if(ingW && ingW!=='thing'){
+    const st=ingW.replace(/ing$/,'');
+    const hit=it.verbs.find(x=>{const v=x.v.split(' ')[0];return st===v||st===v+v.slice(-1)||st+'e'===v||st===v.replace(/e$/,'')||st.replace(/y$/,'')===v.replace(/y$/,'');});
+    return {type:'ing',verb:hit||it.verbs[0]};
+  }
+  if(!m) return {type:'other'};
+  if(!/^to\b/.test(rest)){
+    if(rest==='') return {type:'noVerb'};
+    if(it.obj.includes(rest.split(' ')[0])) return {type:'noVerb'};
+    return {type:'noTo'};
+  }
+  const after=rest.replace(/^to\s*/,'');
+  if(after===''||it.obj.includes(after.split(' ')[0])) return {type:'noVerb'};
+  const w=after.split(' ')[0];
+  const sHit=it.verbs.some(x=>{const v=x.v.split(' ')[0];return w!==v&&(w===v+'s'||w===v+'es'||w===v.replace(/y$/,'ies'));});
+  if(sHit) return {type:'s'};
+  const vHit=it.verbs.find(x=>after===x.v);
+  if(vHit && hv!==need) return {type:'agree',hv};
+  if(hv===need) return {type:'verb'};
+  return {type:'other'};
+}
+function typeQuiz(el,data){
+  let list,i,score,tries;
+  function start(){list=shuffle(data);i=0;score=0;show();}
+  function show(){
+    if(i>=list.length) return finish();
+    const it=list[i]; tries=0;
+    el.innerHTML=`<div class="top"><h2>Допиши</h2><span class="count">${i+1} из ${list.length}</span></div>
+      <p class="lead">Впиши have to или has to и глагол из скобок.</p><div class="bar"><i style="width:${i/list.length*100}%"></i></div>
+      <div class="q">${it.pre} <span class="gap">&nbsp;?&nbsp;</span> <span class="vb">(${it.verbs[0].v})</span> ${it.post}</div>
+      <div class="type-row"><input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ"><button class="check">Проверить</button></div>
+      <div class="fb"></div><button class="next hidden">Дальше</button>`;
+    const inp=el.querySelector('input'), btn=el.querySelector('.check');
+    btn.onclick=()=>check(inp,it); inp.onkeydown=e=>{if(e.key==='Enter')check(inp,it);};
+    inp.focus({preventScroll:true});
+  }
+  function check(inp,it){
+    const d=diagnose(inp.value,it), fb=el.querySelector('.fb'), gap=el.querySelector('.gap');
+    if(d.type==='empty'){fb.className='fb show bad';fb.innerHTML='<b class="t">Сначала впиши ответ ✏️</b>';return;}
+    tries++;
+    const need=it.ans.split(' ')[0];
+    let t,msg='',fun='',shown=it.ans;
+    if(d.type==='ok'){ t='Верно! 🎉'; msg=d.verb.ru; shown=need+' to '+d.verb.v; if(tries===1)score++; }
+    else{
+      t='Смешная ошибка! 😄';
+      if(d.type==='ing'){fun=d.verb.ing;msg='После to — просто глагол, без -ing.';}
+      else if(d.type==='noTo'){fun=it.noTo;msg='Потерялось to! Без to слово have значит «иметь».';}
+      else if(d.type==='noVerb'){fun=it.noVerb;msg='Нет глагола! Что именно надо делать?';}
+      else if(d.type==='s'){fun=it.sF;msg='Лишняя -s! «s» только одна: после to глагол без -s.';}
+      else if(d.type==='agree'){fun=it.agF;msg=it.pre+' → '+(d.hv==='have'?'has':'have')+'. Помни: I, you, we, they → have; he, she, it → has.';}
+      else if(d.type==='verb'){t='Почти! 🤏';msg='have / has to стоит верно, но нужен глагол из скобок: '+it.verbs[0].v+'.';}
+      else {t='Почти! 🤏';msg='Нужно: have to или has to + глагол.';}
+    }
+    const ok=d.type==='ok', full=`${it.pre} ${shown} ${it.post}`;
+    inp.className=ok?'ok':'bad';
+    fb.className='fb show '+(ok?'ok':'bad');
+    fb.innerHTML=`<b class="t">${t}</b>${fun?`<div class="funny"><small>Если перевести твой ответ:</small>${fun}</div>`:''}<div style="margin-top:6px">${msg}</div>`
+      +(ok?sayBtn(full):(tries>=2?`<div style="margin-top:6px">Правильно: <b>${full}</b></div>${sayBtn(full)}`:'<div style="margin-top:6px">Попробуй ещё раз!</div>'));
+    if(ok||tries>=2){
+      gap.textContent=shown; gap.classList.add(ok?'ok':'bad'); el.querySelector('.vb').classList.add('hidden');
+      el.querySelector('.check').disabled=true; inp.disabled=true;
+      const n=el.querySelector('.next'); n.classList.remove('hidden'); n.onclick=()=>{i++;show();}; n.focus();
+    }
+  }
+  function finish(){
+    el.innerHTML=`<div class="result"><h2>Допиши</h2><div class="stars">${stars(score,list.length)}</div>
+      <div class="big">${score} / ${list.length}</div><p>${praise(score,list.length)}</p><p class="lead">Очко даётся за ответ с первой попытки.</p>
+      <button class="next">Ещё раз</button></div>`;
+    el.querySelector('.next').onclick=start;
+  }
+  start();
+}
+
+/* ---------- gallery ---------- */
+document.getElementById('gallery').innerHTML=GALLERY.map(g=>`<div class="mc"><span class="kind">${g.k}</span>
+  <div class="wrong">${g.w}</div><div class="sounds"><small>Звучит как:</small>${g.s}</div>
+  <div class="why">${g.why}</div><div class="right">✅ ${g.r} ${sayBtn(g.r)}</div></div>`).join('');
+
+/* ---------- true / false ---------- */
+function tfQuiz(el,data){
+  let list,i,score;
+  function start(){list=shuffle(data);i=0;score=0;show();}
+  function show(){
+    if(i>=list.length) return finish();
+    const it=list[i];
+    el.innerHTML=`<div class="top"><h2>Верно или ошибка?</h2><span class="count">${i+1} из ${list.length}</span></div>
+      <p class="lead">Найди смешные ошибки!</p><div class="bar"><i style="width:${i/list.length*100}%"></i></div>
+      <div class="q">${it.s}</div>
+      <div class="tf"><button class="t" data-v="1">✅ Верно</button><button class="f" data-v="0">❌ Ошибка</button></div>
+      <div class="fb"></div><button class="next hidden">Дальше</button>`;
+    el.querySelectorAll('.tf button').forEach(b=>b.onclick=()=>answer(b,it));
+  }
+  function answer(b,it){
+    const pick=b.dataset.v==='1', ok=pick===it.ok; if(ok)score++;
+    el.querySelectorAll('.tf button').forEach(x=>x.disabled=true); b.classList.add('pick');
+    const fb=el.querySelector('.fb'); fb.className='fb show '+(ok?'ok':'bad');
+    const right=it.ok?it.s:it.r;
+    fb.innerHTML=`<b class="t">${ok?'Точно! 🎉':'Не угадал 🙈'}</b>`
+      +(it.ok?'Это предложение правильное.':`<div class="funny"><small>Звучит как:</small>${it.f}</div><div style="margin-top:6px">Правильно: <b>${it.r}</b></div>`)
+      +sayBtn(right);
+    const n=el.querySelector('.next'); n.classList.remove('hidden'); n.onclick=()=>{i++;show();}; n.focus();
+  }
+  function finish(){
+    el.innerHTML=`<div class="result"><h2>Верно или ошибка?</h2><div class="stars">${stars(score,list.length)}</div>
+      <div class="big">${score} / ${list.length}</div><p>${praise(score,list.length)}</p><button class="next">Ещё раз</button></div>`;
+    el.querySelector('.next').onclick=start;
+  }
+  start();
+}
+
+choiceQuiz(document.querySelector('[data-quiz="hh"]'),HH,['have','has'],'have или has?','Выбери правильное слово.');
+choiceQuiz(document.querySelector('[data-quiz="dd"]'),DD,null,'Нет и вопрос','don’t или doesn’t? Do или Does?');
+typeQuiz(document.querySelector('[data-type="ty"]'),TY);
+tfQuiz(document.querySelector('[data-tf="tf"]'),TF);
+</script>
+</body>
+</html>
