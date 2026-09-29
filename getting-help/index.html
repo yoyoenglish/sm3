@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Getting help: тренажёр к истории из Super Minds 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+<style>
+:root{
+  --ink:#1D2B53;
+  --ink-soft:#56628A;
+  --sky:#D7EEF3;
+  --paper:#FFFFFF;
+  --rule:#E9F2F9;
+  --margin:#E4575E;
+  --marker:#E13BCB;
+  --sun:#FFC93C;
+  --sun-soft:#FFF1BF;
+  --ok:#1B8F5F;
+  --ok-bg:#E2F5EB;
+  --bad:#C9362D;
+  --bad-bg:#FCE8E6;
+  --font:"Andika","Trebuchet MS","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.45;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+
+/* header */
+.series{margin:0;font-size:16px;color:var(--ink-soft)}
+h1{margin:2px 0 0;font-size:clamp(42px,10vw,68px);line-height:1.05;font-weight:700;letter-spacing:-.01em;
+  display:inline-block;position:relative;padding-bottom:14px}
+h1 svg{position:absolute;left:-4px;bottom:0;width:calc(100% + 8px);height:16px}
+.tts-note{margin:10px 0 0;font-size:15px;color:var(--bad)}
+
+/* secret code */
+.code{margin:22px 0 26px}
+.code-row{display:flex;flex-wrap:wrap;gap:10px 18px}
+.word{display:flex;gap:5px}
+.tile{width:34px;height:42px;border-radius:7px;background:var(--ink);color:var(--sun);display:grid;place-items:center;
+  font-size:22px;font-weight:700;line-height:1}
+.tile.open{background:var(--paper);color:var(--ink);box-shadow:inset 0 -3px 0 var(--marker);animation:pop .45s ease}
+@keyframes pop{from{transform:rotateX(90deg)}to{transform:rotateX(0)}}
+.code-note{margin:10px 0 0;font-size:16px;color:var(--ink-soft)}
+.code.solved .code-note{color:var(--ink);font-weight:700}
+
+/* tabs */
+.tabs{display:flex;gap:6px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:#BFE0E8;border:0;border-radius:12px 12px 0 0;
+  padding:10px 16px 9px;cursor:pointer;white-space:nowrap}
+.tab:hover{background:#CDE8EE}
+.tab[aria-selected="true"]{background:var(--paper);box-shadow:inset 0 3px 0 var(--marker)}
+.tab .short{display:none}
+
+/* stage: library catalogue card */
+.stage{position:relative;border-radius:14px;min-height:420px;padding:32px 22px 26px;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--margin),var(--margin)),repeating-linear-gradient(to bottom,transparent 0 37px,var(--rule) 37px 38px);
+  background-repeat:no-repeat,repeat;background-size:100% 2px,100% 100%;background-position:0 16px,0 18px;
+  box-shadow:0 1px 0 rgba(29,43,83,.08),0 18px 30px -22px rgba(29,43,83,.45)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-size:16px;color:var(--ink-soft)}
+.task{margin:0 0 18px;font-size:17px;color:var(--ink-soft)}
+.mark{text-decoration:underline;text-decoration-color:var(--marker);text-decoration-thickness:3px;text-underline-offset:.22em;text-decoration-skip-ink:none}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.center{display:flex;justify-content:center}
+
+/* buttons */
+.btn{font:inherit;font-weight:700;font-size:17px;color:var(--ink);background:var(--paper);border:2px solid var(--ink);border-radius:10px;
+  padding:10px 18px;cursor:pointer;min-height:48px}
+.btn:hover{background:#F1F6FB}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#2A3B6E}
+.btn.small{font-size:15px;min-height:38px;padding:6px 12px;border-width:1.5px}
+:focus-visible{outline:3px solid var(--marker);outline-offset:2px}
+
+/* flashcards */
+.flash{perspective:1000px;cursor:pointer;margin:0 auto 18px;max-width:520px;height:230px;border-radius:16px}
+.flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flash.flipped .flash-inner{transform:rotateY(180deg)}
+.flash.instant .flash-inner{transition:none}
+.face{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 20px 36px;text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid var(--ink)}
+.front{background:var(--sun-soft)}
+.back{background:#EAF6F9;transform:rotateY(180deg)}
+.flash .phrase{font-size:clamp(30px,7vw,44px);font-weight:700;line-height:1.2}
+.flash .ru{font-size:clamp(26px,6vw,36px);font-weight:700;line-height:1.2}
+.flash .en-sm{margin-top:10px;font-size:18px;color:var(--ink-soft)}
+.flash .hint{position:absolute;bottom:12px;left:0;right:0;font-size:14px;color:var(--ink-soft)}
+
+/* match */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col{display:flex;flex-direction:column;gap:10px}
+.tile-btn,.opt{font:inherit;font-size:18px;text-align:left;color:var(--ink);background:var(--paper);border:2px solid #9FB3CF;border-radius:10px;
+  padding:12px 14px;cursor:pointer;min-height:56px;line-height:1.25}
+.tile-btn:hover,.opt:hover{border-color:var(--ink)}
+.tile-btn.en{font-weight:700}
+.tile-btn.sel{border-color:var(--ink);background:var(--sun-soft)}
+.tile-btn.done{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);cursor:default}
+.tile-btn.wrong{border-color:var(--bad);background:var(--bad-bg);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* listen + gap */
+.opts{display:grid;gap:10px}
+.opt:disabled{cursor:default}
+.opt:disabled:hover{border-color:#9FB3CF}
+.opt.ok,.opt.ok:disabled:hover{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad,.opt.bad:disabled:hover{border-color:var(--bad);background:var(--bad-bg)}
+.big-listen{display:inline-flex;align-items:center;gap:10px;margin:0 0 22px;font:inherit;font-weight:700;font-size:20px;
+  background:var(--ink);color:#fff;border:0;border-radius:999px;padding:14px 26px;cursor:pointer}
+.big-listen:hover{background:#2A3B6E}
+.sentence{font-size:clamp(21px,4.6vw,26px);line-height:1.6;margin:0 0 22px}
+.blank{display:inline-block;min-width:5.5em;border-bottom:3px dashed var(--ink-soft);text-align:center}
+.blank.filled{min-width:0;border-bottom:0;font-weight:700}
+.feedback{margin:16px 0 0;font-size:18px;min-height:1.5em}
+.feedback.ok{color:var(--ok)}
+.feedback.bad{color:var(--bad)}
+.ru-line{margin:6px 0 0;font-size:16px;color:var(--ink-soft)}
+
+/* result */
+.result{text-align:center;padding:26px 0 10px}
+.result h2{margin:8px 0 4px;font-size:30px}
+.result p{margin:0 0 20px;color:var(--ink-soft)}
+.stars{font-size:52px;letter-spacing:6px;line-height:1}
+.stars .on{color:var(--sun);-webkit-text-stroke:1.5px var(--ink)}
+.stars .off{color:#D3DEE9}
+
+@media (max-width:520px){
+  .stage{padding:30px 14px 20px}
+  .match{gap:8px}
+  .tile-btn{font-size:16px;padding:10px}
+  .tile{width:28px;height:36px;font-size:18px}
+  .word{gap:4px}
+  .wrap{padding-left:12px;padding-right:12px}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 4px}
+  .tab{font-size:15px;padding:10px 2px 9px;min-width:0;text-align:center}
+  .tab .long{display:none}
+  .tab .short{display:inline}
+}
+@media (max-width:360px){
+  .tab{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .flash-inner,.flash.flipped .flash-inner{transform:none}
+  .back{transform:none;display:none}
+  .flash.flipped .front{display:none}
+  .flash.flipped .back{display:flex}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="series">Тренажёр к истории из Super Minds 3</p>
+    <h1>Getting help
+      <svg viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path d="M4 10 C 60 4, 120 14, 180 8 S 268 5, 296 9" stroke="#E13BCB" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+    </h1>
+    <p class="tts-note" id="ttsNote" hidden>В этом браузере нет озвучки. Открой страницу в Chrome или Safari, чтобы слушать фразы.</p>
+  </header>
+
+  <section class="code" id="code" aria-label="Секретное сообщение">
+    <div class="code-row" id="codeRow" aria-hidden="true"></div>
+    <p class="code-note" id="codeNote" aria-live="polite">Секретное сообщение: каждые два правильных ответа открывают одну букву.</p>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Упражнения">
+    <button class="tab" role="tab" type="button" data-mode="cards" aria-selected="true"><span class="long">Карточки</span><span class="short">Карты</span></button>
+    <button class="tab" role="tab" type="button" data-mode="match" aria-selected="false"><span class="long">Найди пару</span><span class="short">Пары</span></button>
+    <button class="tab" role="tab" type="button" data-mode="listen" aria-selected="false"><span class="long">Послушай и выбери</span><span class="short">Слушай</span></button>
+    <button class="tab" role="tab" type="button" data-mode="gap" aria-selected="false"><span class="long">Вставь фразу</span><span class="short">Вставь</span></button>
+  </nav>
+  <main class="stage" id="stage" role="tabpanel"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- words and phrases (underlined in the story, in story order) ---------- */
+const ITEMS = [
+  {en:"Getting help",           say:"Getting help",           ru:"получать помощь"},
+  {en:"Why…?",                  say:"Why?",                   ru:"почему…?"},
+  {en:"help us",                say:"help us",                ru:"помочь нам"},
+  {en:"It's in code.",          say:"It's in code.",          ru:"Это зашифровано."},
+  {en:"It isn't easy.",         say:"It isn't easy.",         ru:"Это непросто."},
+  {en:"lots of clues",          say:"lots of clues",          ru:"много подсказок (улик)"},
+  {en:"This is difficult!",     say:"This is difficult!",     ru:"Это трудно!"},
+  {en:"keep the book",          say:"keep the book",          ru:"оставить книгу себе"},
+  {en:"tomorrow",               say:"tomorrow",               ru:"завтра"},
+  {en:"I've got to go.",        say:"I've got to go.",        ru:"Мне пора идти."},
+  {en:"thanks anyway",          say:"thanks anyway",          ru:"всё равно спасибо"},
+  {en:"What's going on?",       say:"What's going on?",       ru:"Что происходит?"},
+  {en:"It's dark!",             say:"It's dark!",             ru:"Темно!"},
+  {en:"get out of here",        say:"get out of here",        ru:"выбраться отсюда"},
+  {en:"our book",               say:"our book",               ru:"наша книга"},
+  {en:"probably",               say:"probably",               ru:"наверное"},
+  {en:"No way!",                say:"No way!",                ru:"Не может быть!"},
+  {en:"have to find a way to…", say:"have to find a way to",  ru:"нужно найти способ…"},
+  {en:"yet",                    say:"yet",                    ru:"пока ещё"},
+  {en:"follow those kids",      say:"follow those kids",      ru:"проследить за теми детьми"}
+];
+/* pairs too close in meaning to be offered as distractors for each other */
+const CONFUSABLE = [[0,2],[4,6]];
+const conf = (a,b) => CONFUSABLE.some(g => g.includes(a) && g.includes(b));
+
+/* match rounds follow the order of the story */
+const ROUNDS = [[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19]];
+
+/* gap-fill: new sentences with the same phrases */
+const GAPS = [
+  {s:"When you have a problem, ask a teacher or a friend. ___ is OK!", a:"Getting help", o:["Yet","Probably"],
+   ru:"Если у тебя проблема, спроси учителя или друга. Получать помощь — это нормально!"},
+  {s:"___ is Ben scared? — Because it's dark!", a:"Why", o:["Yet","Tomorrow"],
+   ru:"Почему Бен боится? — Потому что темно!"},
+  {s:"Our homework is very hard. Dad, can you ___, please?", a:"help us", o:["keep the book","follow those kids"],
+   ru:"Наше домашнее задание очень трудное. Папа, можешь нам помочь, пожалуйста?"},
+  {s:"I can't read this letter. There are only numbers and strange signs. ___", a:"It's in code.", o:["Thanks anyway.","I've got to go."],
+   ru:"Я не могу прочитать это письмо. Там только цифры и странные знаки. Оно зашифровано."},
+  {s:"I can't do this puzzle. ___ Can you help me?", a:"It isn't easy.", o:["Thanks anyway.","I've got to go."],
+   ru:"Я не могу решить эту головоломку. Это непросто. Поможешь мне?"},
+  {s:"Detectives look for ___ to solve a mystery.", a:"lots of clues", o:["tomorrow","our book"],
+   ru:"Детективы ищут много улик, чтобы разгадать тайну."},
+  {s:"Ben tries and tries, but he can't read the code. “Oh no! ___”", a:"This is difficult!", o:["Thanks anyway.","Getting help"],
+   ru:"Бен пытается и пытается, но не может прочитать код. «О нет! Это трудно!»"},
+  {s:"I love this library book. Can I ___ for one more week?", a:"keep the book", o:["get out of here","follow those kids"],
+   ru:"Мне очень нравится эта библиотечная книга. Можно оставить её ещё на неделю?"},
+  {s:"Today is Monday. ___ is Tuesday.", a:"Tomorrow", o:["Yet","Probably"],
+   ru:"Сегодня понедельник. Завтра вторник."},
+  {s:"Oh, it's eight o'clock! My bus is here. ___ Bye!", a:"I've got to go.", o:["It's in code.","It isn't easy."],
+   ru:"Ой, уже восемь часов! Мой автобус пришёл. Мне пора идти. Пока!"},
+  {s:"“Sorry, I haven't got a pen.” — “That's OK, ___!”", a:"thanks anyway", o:["no way","tomorrow"],
+   ru:"«Извини, у меня нет ручки». — «Ничего, всё равно спасибо!»"},
+  {s:"There's a lot of noise in the classroom. The teacher comes in and asks, “___”", a:"What's going on?", o:["Thanks anyway.","I've got to go."],
+   ru:"В классе очень шумно. Учитель входит и спрашивает: «Что происходит?»"},
+  {s:"The lights go off. I can't see anything. ___", a:"It's dark!", o:["Thanks anyway.","Getting help"],
+   ru:"Свет гаснет. Я ничего не вижу. Темно!"},
+  {s:"There's a big spider in the room! We have to ___!", a:"get out of here", o:["keep the book","help us"],
+   ru:"В комнате огромный паук! Нам надо выбраться отсюда!"},
+  {s:"Lucy and I have got a secret book. It's ___.", a:"our book", o:["tomorrow","probably"],
+   ru:"У нас с Люси есть секретная книга. Это наша книга."},
+  {s:"Where's Ben? He's ___ in the library.", a:"probably", o:["yet","tomorrow"],
+   ru:"Где Бен? Он, наверное, в библиотеке."},
+  {s:"“There's an elephant in our school!” — “___ I don't believe you!”", a:"No way!", o:["Thanks anyway.","It isn't easy."],
+   ru:"«В нашей школе слон!» — «Не может быть! Я тебе не верю!»"},
+  {s:"The door is locked. We ___ open it.", a:"have to find a way to", o:["get out of here","keep the book"],
+   ru:"Дверь заперта. Нам нужно найти способ её открыть."},
+  {s:"I can't swim ___, but I'm learning.", a:"yet", o:["tomorrow","probably"],
+   ru:"Я пока ещё не умею плавать, но я учусь."},
+  {s:"Those kids have got the secret book! Let's ___ and see where they go.", a:"follow those kids", o:["help us","keep the book"],
+   ru:"У тех детей секретная книга! Давай проследим за ними и посмотрим, куда они пойдут."}
+];
+
+/* ---------- helpers ---------- */
+function el(tag, props, ...kids){
+  const n = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.slice(0,2) === 'on') n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of kids){ if (c == null) continue; n.append(c.nodeType ? c : document.createTextNode(c)); }
+  return n;
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const range = n => Array.from({length:n}, (_, i) => i);
+
+/* ---------- speech (Web Speech API) ---------- */
+const TTS = (function(){
+  const ok = ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+  let voice = null;
+  function pick(){
+    if (!ok) return;
+    const en = speechSynthesis.getVoices().filter(v => /^en([-_]|$)/i.test(v.lang));
+    voice = en.find(v => /en[-_]GB/i.test(v.lang) && /Google|Serena|Kate|Daniel|Martha|Arthur|Natural|Libby|Sonia/i.test(v.name))
+         || en.find(v => /en[-_]GB/i.test(v.lang))
+         || en.find(v => /en[-_]US/i.test(v.lang))
+         || en[0] || null;
+  }
+  if (ok){
+    pick();
+    if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pick);
+    else speechSynthesis.onvoiceschanged = pick;
+  }
+  function say(text){
+    if (!ok) return;
+    const clean = text.replace(/[“”«»]/g, '').replace(/\s+—\s+/g, ' ').replace(/…/g, '');
+    if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(clean);
+    if (voice){ u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-GB'; }
+    u.rate = 0.85;
+    speechSynthesis.speak(u);
+  }
+  return {ok, say};
+})();
+if (!TTS.ok) document.getElementById('ttsNote').hidden = false;
+
+/* ---------- secret code ---------- */
+const MESSAGE = "YOU CAN READ THE CODE";
+const GLYPH = {Y:"▽",O:"○",U:"□",C:"◐",A:"△",N:"⊕",R:"☆",E:"✱",D:"◇",T:"✕",H:"♡"};
+const codeBox = document.getElementById('code');
+const codeRow = document.getElementById('codeRow');
+const codeNote = document.getElementById('codeNote');
+const tiles = [];
+MESSAGE.split(' ').forEach(w => {
+  const word = el('span', {class:'word'});
+  for (const ch of w){
+    const t = el('span', {class:'tile', text:GLYPH[ch]});
+    t.dataset.ch = ch; tiles.push(t); word.append(t);
+  }
+  codeRow.append(word);
+});
+let opened = 0, correct = 0;
+const PER_LETTER = 2; /* one letter for every two correct answers */
+function revealOne(){
+  correct++;
+  if (correct % PER_LETTER !== 0) return;
+  const hidden = tiles.filter(t => !t.classList.contains('open'));
+  if (!hidden.length) return;
+  const t = hidden[Math.floor(Math.random() * hidden.length)];
+  t.textContent = t.dataset.ch; t.classList.add('open'); opened++;
+  if (opened === tiles.length){
+    codeBox.classList.add('solved');
+    codeNote.textContent = 'Код разгадан! YOU CAN READ THE CODE!';
+  } else {
+    codeNote.textContent = 'Открыто букв: ' + opened + ' из ' + tiles.length + '. Каждые два правильных ответа открывают ещё одну.';
+  }
+}
+
+/* ---------- result screen ---------- */
+function result(title, stars, sub, btnText, onClick){
+  const s = el('div', {class:'stars', role:'img', 'aria-label': stars + ' из 3 звёзд'});
+  for (let k = 0; k < 3; k++) s.append(el('span', {class: k < stars ? 'on' : 'off', text:'★'}));
+  return el('div', {class:'result'}, s, el('h2', {text:title}), el('p', {text:sub}),
+    el('button', {class:'btn primary', type:'button', onclick:onClick}, btnText));
+}
+
+const stage = document.getElementById('stage');
+
+/* ---------- mode 1: flashcards ---------- */
+let cardOrder = range(ITEMS.length), cardPos = 0;
+function renderCards(){
+  const card = el('div', {class:'flash', role:'button', tabindex:'0', 'aria-label':'Карточка. Нажми, чтобы перевернуть'});
+  const inner = el('div', {class:'flash-inner'});
+  const front = el('div', {class:'face front'});
+  const back = el('div', {class:'face back'});
+  inner.append(front, back); card.append(inner);
+  const counter = el('span');
+  const flip = () => card.classList.toggle('flipped');
+  card.addEventListener('click', flip);
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); } });
+
+  function show(speakIt){
+    const it = ITEMS[cardOrder[cardPos]];
+    card.classList.add('instant');
+    card.classList.remove('flipped');
+    void card.offsetWidth;
+    card.classList.remove('instant');
+    front.replaceChildren(el('span', {class:'phrase mark', text:it.en}), el('span', {class:'hint', text:'нажми, чтобы увидеть перевод'}));
+    back.replaceChildren(el('span', {class:'ru', text:it.ru}), el('span', {class:'en-sm', text:it.en}));
+    counter.textContent = 'Карточка ' + (cardPos + 1) + ' из ' + ITEMS.length;
+    if (speakIt) TTS.say(it.say);
+  }
+  const prev = el('button', {class:'btn', type:'button', onclick:() => { cardPos = (cardPos - 1 + ITEMS.length) % ITEMS.length; show(true); }}, 'Назад');
+  const listen = el('button', {class:'btn primary', type:'button', onclick:() => TTS.say(ITEMS[cardOrder[cardPos]].say)}, '🔊 Послушать');
+  const next = el('button', {class:'btn', type:'button', onclick:() => { cardPos = (cardPos + 1) % ITEMS.length; show(true); }}, 'Дальше');
+  const mix = el('button', {class:'btn small', type:'button', onclick:() => { cardOrder = shuffle(cardOrder); cardPos = 0; show(true); }}, 'Перемешать');
+
+  stage.append(el('div', {class:'meta'}, counter, mix), card, el('div', {class:'row'}, prev, listen, next));
+  show(false);
+}
+
+/* ---------- mode 2: match pairs ---------- */
+let matchRound = 0;
+function renderMatch(){
+  const idx = ROUNDS[matchRound];
+  const mistakesEl = el('span', {text:'Ошибок: 0'});
+  const colEn = el('div', {class:'col'}), colRu = el('div', {class:'col'});
+  let selEn = null, selRu = null, found = 0, mistakes = 0, busy = false;
+
+  function pick(b, side){
+    if (busy || b.classList.contains('done')) return;
+    if (side === 'en'){ if (selEn) selEn.classList.remove('sel'); selEn = b; TTS.say(ITEMS[+b.dataset.i].say); }
+    else { if (selRu) selRu.classList.remove('sel'); selRu = b; }
+    b.classList.add('sel');
+    if (selEn && selRu){
+      const a = selEn, r = selRu; selEn = selRu = null;
+      if (a.dataset.i === r.dataset.i){
+        [a, r].forEach(x => { x.classList.remove('sel'); x.classList.add('done'); x.disabled = true; });
+        found++; revealOne();
+        if (found === idx.length) setTimeout(finish, 550);
+      } else {
+        mistakes++; mistakesEl.textContent = 'Ошибок: ' + mistakes; busy = true;
+        [a, r].forEach(x => { x.classList.remove('sel'); x.classList.add('wrong'); });
+        setTimeout(() => { [a, r].forEach(x => x.classList.remove('wrong')); busy = false; }, 600);
+      }
+    }
+  }
+  shuffle(idx).forEach(i => colEn.append(el('button', {class:'tile-btn en', type:'button', 'data-i':i, onclick:e => pick(e.currentTarget, 'en')}, ITEMS[i].en)));
+  shuffle(idx).forEach(i => colRu.append(el('button', {class:'tile-btn ru', type:'button', 'data-i':i, onclick:e => pick(e.currentTarget, 'ru')}, ITEMS[i].ru)));
+
+  function finish(){
+    const last = matchRound === ROUNDS.length - 1;
+    stage.replaceChildren(result('Все пары найдены!', mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1,
+      'Раунд ' + (matchRound + 1) + ' из ' + ROUNDS.length + '. Ошибок: ' + mistakes + '.',
+      last ? 'Начать сначала' : 'Следующий раунд',
+      () => { matchRound = last ? 0 : matchRound + 1; stage.replaceChildren(); renderMatch(); }));
+  }
+  stage.append(
+    el('div', {class:'meta'}, el('span', {text:'Раунд ' + (matchRound + 1) + ' из ' + ROUNDS.length}), mistakesEl),
+    el('p', {class:'task', text:'Нажми на английскую фразу, а потом на её перевод.'}),
+    el('div', {class:'match'}, colEn, colRu));
+}
+
+/* ---------- mode 3: listen and choose ---------- */
+function renderListen(){
+  const qs = shuffle(range(ITEMS.length)).slice(0, 10);
+  let n = 0, score = 0;
+  const box = el('div'); stage.append(box);
+
+  function ask(){
+    const i = qs[n], it = ITEMS[i];
+    const pool = shuffle(range(ITEMS.length).filter(k => k !== i && !conf(i, k))).slice(0, 3);
+    const opts = shuffle([i, ...pool]);
+    const fb = el('div', {class:'feedback', 'aria-live':'polite'});
+    const nextBtn = el('button', {class:'btn primary', type:'button', hidden:''}, n === qs.length - 1 ? 'Узнать результат' : 'Дальше');
+    nextBtn.addEventListener('click', () => { n++; if (n < qs.length) ask(); else finish(); });
+    const list = el('div', {class:'opts'});
+    const buttons = opts.map(k => el('button', {class:'opt', type:'button', onclick:e => answer(e.currentTarget, k)}, ITEMS[k].ru));
+    list.append(...buttons);
+
+    function answer(b, k){
+      buttons.forEach(x => x.disabled = true);
+      if (k === i){
+        b.classList.add('ok'); score++; revealOne();
+        fb.className = 'feedback ok';
+        fb.replaceChildren('Верно! ', el('span', {class:'mark', text:it.en}), ' — ' + it.ru);
+      } else {
+        b.classList.add('bad'); buttons[opts.indexOf(i)].classList.add('ok');
+        fb.className = 'feedback bad';
+        fb.replaceChildren('Не совсем. Это была фраза ', el('span', {class:'mark', text:it.en}), ' — ' + it.ru);
+        TTS.say(it.say);
+      }
+      nextBtn.hidden = false; nextBtn.focus();
+    }
+    box.replaceChildren(
+      el('div', {class:'meta'}, el('span', {text:'Вопрос ' + (n + 1) + ' из ' + qs.length}), el('span', {text:'Верно: ' + score})),
+      el('p', {class:'task', text:'Послушай фразу и выбери её перевод.'}),
+      el('div', {class:'center'}, el('button', {class:'big-listen', type:'button', onclick:() => TTS.say(it.say)}, '🔊 Послушать ещё раз')),
+      list, fb, el('div', {class:'row', style:'margin-top:14px'}, nextBtn));
+    TTS.say(it.say);
+  }
+  function finish(){
+    box.replaceChildren(result(score + ' из ' + qs.length, score >= 9 ? 3 : score >= 6 ? 2 : 1,
+      score >= 9 ? 'Отличный слух!' : 'Сыграй ещё раунд: фразы будут в другом порядке.',
+      'Ещё раунд', () => { stage.replaceChildren(); renderListen(); }));
+  }
+  ask();
+}
+
+/* ---------- mode 4: fill the gap ---------- */
+function renderGap(){
+  const qs = shuffle(range(GAPS.length)).slice(0, 10);
+  let n = 0, score = 0;
+  const box = el('div'); stage.append(box);
+
+  function ask(){
+    const g = GAPS[qs[n]];
+    const parts = g.s.split('___');
+    const blank = el('span', {class:'blank', 'aria-label':'пропуск'}, '\u00A0');
+    const sentence = el('p', {class:'sentence'}, parts[0], blank, parts[1]);
+    const opts = shuffle([g.a, ...g.o]);
+    const fb = el('div', {class:'feedback', 'aria-live':'polite'});
+    const ruLine = el('p', {class:'ru-line', hidden:''}, g.ru);
+    const nextBtn = el('button', {class:'btn primary', type:'button', hidden:''}, n === qs.length - 1 ? 'Узнать результат' : 'Дальше');
+    nextBtn.addEventListener('click', () => { n++; if (n < qs.length) ask(); else finish(); });
+    const buttons = opts.map(o => el('button', {class:'opt', type:'button', onclick:e => answer(e.currentTarget, o)}, o));
+    const list = el('div', {class:'opts'}, ...buttons);
+
+    function answer(b, o){
+      buttons.forEach(x => x.disabled = true);
+      blank.textContent = g.a; blank.classList.add('filled', 'mark');
+      if (o === g.a){
+        b.classList.add('ok'); score++; revealOne();
+        fb.className = 'feedback ok'; fb.textContent = 'Верно!';
+      } else {
+        b.classList.add('bad'); buttons[opts.indexOf(g.a)].classList.add('ok');
+        fb.className = 'feedback bad'; fb.replaceChildren('Не совсем. Здесь нужно: ', el('span', {class:'mark', text:g.a}));
+      }
+      ruLine.hidden = false;
+      TTS.say(g.s.replace('___', g.a));
+      nextBtn.hidden = false; nextBtn.focus();
+    }
+    box.replaceChildren(
+      el('div', {class:'meta'}, el('span', {text:'Предложение ' + (n + 1) + ' из ' + qs.length}), el('span', {text:'Верно: ' + score})),
+      el('p', {class:'task', text:'Выбери фразу, которая подходит в пропуск.'}),
+      sentence, list, fb, ruLine, el('div', {class:'row', style:'margin-top:14px'}, nextBtn));
+  }
+  function finish(){
+    box.replaceChildren(result(score + ' из ' + qs.length, score >= 9 ? 3 : score >= 6 ? 2 : 1,
+      score >= 9 ? 'Ты отлично знаешь эти фразы!' : 'Сыграй ещё раунд: будут другие предложения.',
+      'Ещё раунд', () => { stage.replaceChildren(); renderGap(); }));
+  }
+  ask();
+}
+
+/* ---------- tabs ---------- */
+const MODES = {cards:renderCards, match:renderMatch, listen:renderListen, gap:renderGap};
+const tabs = Array.from(document.querySelectorAll('.tab'));
+function setMode(m){
+  tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.mode === m)));
+  if (TTS.ok) speechSynthesis.cancel();
+  stage.replaceChildren();
+  MODES[m]();
+}
+tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+setMode('cards');
+})();
+</script>
+</body>
+</html>
