@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ordinal numbers &amp; dates — Super Minds 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3FA; --paper:#FFFFFF; --ink:#1F2A44; --muted:#5B6782;
+  --red:#E5383B; --red-dark:#B8242A; --sun:#FFC93C; --mint:#22A866; --blue:#3A6FD8; --line:#D5DEEC;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top h1{font-size:30px;line-height:1.1;margin:0;font-weight:800}
+.top p{margin:0;color:var(--muted);font-size:16px}
+
+/* hero: tear-off calendar */
+.hero{display:grid;grid-template-columns:minmax(240px,300px) 1fr;gap:28px;align-items:center;margin-bottom:28px}
+.cal{position:relative;perspective:900px}
+.rings{position:absolute;top:-10px;left:0;right:0;display:flex;justify-content:space-around;z-index:3}
+.rings span{width:16px;height:26px;border-radius:9px;background:#9AA6BD;border:3px solid #7C88A0}
+.page{background:var(--paper);border-radius:14px;overflow:hidden;box-shadow:0 2px 0 #C9D3E4,0 6px 0 #DCE3EF,0 10px 0 #E7ECF4;transform-origin:top center}
+.page.tear{animation:tear .45s ease-in}
+@keyframes tear{0%{transform:rotateX(0)}100%{transform:rotateX(-90deg);opacity:.2}}
+@media (prefers-reduced-motion:reduce){.page.tear{animation:none}}
+.page-head{background:var(--red);color:#fff;text-align:center;font-size:26px;font-weight:700;padding:16px 8px 8px}
+.page-day{text-align:center;font-size:118px;font-weight:800;line-height:1;padding:14px 0 0}
+.page-day sup{font-size:40px;color:var(--red);vertical-align:top;position:relative;top:14px;margin-left:2px}
+.page-say{text-align:center;font-size:21px;padding:4px 12px 18px;color:var(--muted)}
+.cal-btns{display:flex;gap:10px;margin-top:20px}
+.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:700;background:var(--paper);box-shadow:0 3px 0 var(--line)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--red);color:#fff;box-shadow:0 3px 0 var(--red-dark)}
+.btn.say::before{content:"🔊 "}
+
+.how h2{font-size:24px;margin:0 0 10px;line-height:1.2}
+.pair{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:baseline;margin:0 0 14px}
+.pair dt{color:var(--muted);font-size:16px}
+.pair dd{margin:0;font-size:22px;font-weight:700}
+.pair dd small{font-weight:500;color:var(--muted);font-size:16px}
+.how p{margin:0 0 10px;max-width:60ch}
+.ends{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.ends span{background:var(--paper);border-radius:10px;padding:2px 12px;font-weight:700}
+.ends b{color:var(--red)}
+.months{display:flex;flex-wrap:wrap;gap:6px}
+.months button{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:2px 12px;font-size:16px;font-weight:600}
+.months button:hover{border-color:var(--blue)}
+
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:3px solid var(--line);margin-bottom:20px}
+.tabs button{border:0;background:transparent;padding:8px 14px;font-weight:700;font-size:18px;color:var(--muted);border-radius:10px 10px 0 0;position:relative;top:3px;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);background:var(--paper);border-bottom-color:var(--red)}
+.panel{background:var(--paper);border-radius:16px;padding:22px}
+.hint-ru{color:var(--muted);font-size:16px;margin:0 0 16px}
+
+/* cards grid */
+.grid-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.legend{font-size:15px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--sun);margin-right:6px;vertical-align:-1px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.tile{position:relative;aspect-ratio:1/1;border:2px solid var(--line);background:var(--bg);border-radius:12px;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.tile .n{font-size:30px;font-weight:800;line-height:1}
+.tile .w{display:none;font-size:14px;font-weight:600;line-height:1.1;text-align:center;word-break:break-word;color:var(--muted)}
+.tile.open{background:var(--paper);border-color:var(--red)}
+.tile.open .n sup{color:var(--red);font-size:15px}
+.tile.open .w{display:block;margin-top:4px}
+.tile.tricky::after{content:"";position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--sun)}
+.tile:not(.open) .n sup{display:none}
+
+/* quiz */
+.qtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:var(--muted);font-size:16px}
+.bar{height:8px;background:var(--bg);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.bar span{display:block;height:100%;width:0;background:var(--blue);transition:width .25s}
+.prompt{text-align:center;margin:8px 0 18px}
+.prompt .big{font-size:64px;font-weight:800;line-height:1.05}
+.prompt .big .slot{display:inline-block;min-width:1.4em;border-bottom:5px solid var(--red);color:var(--red)}
+.prompt .q{font-size:18px;color:var(--muted)}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:620px;margin:0 auto}
+.opts.four{grid-template-columns:repeat(4,1fr)}
+.opt{border:3px solid var(--line);background:var(--paper);border-radius:14px;padding:12px 10px;font-size:21px;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt.ok{border-color:var(--mint);background:#E3F6EC}
+.opt.no{border-color:var(--red);background:#FDE6E6}
+.opt:disabled{cursor:default}
+.feedback{text-align:center;min-height:34px;margin-top:14px;font-size:19px;font-weight:700}
+.feedback.ok{color:var(--mint)} .feedback.no{color:var(--red)}
+.next-row{text-align:center;margin-top:8px}
+.listen-btn{font-size:22px;padding:14px 26px}
+.spell{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.spell input{font:inherit;font-size:24px;font-weight:700;padding:8px 14px;border:3px solid var(--line);border-radius:12px;width:min(320px,100%);text-align:center;color:var(--ink)}
+.spell input.ok{border-color:var(--mint)} .spell input.no{border-color:var(--red)}
+.result{text-align:center;padding:20px 0}
+.result .score{font-size:72px;font-weight:800;line-height:1}
+.result .stars{font-size:40px;letter-spacing:6px;margin:6px 0 16px}
+
+@media (max-width:720px){
+  .hero{grid-template-columns:1fr}
+  .cal{max-width:300px;margin:0 auto;width:100%}
+  .opts.four{grid-template-columns:repeat(2,1fr)}
+  .prompt .big{font-size:52px}
+}
+@media (max-width:460px){
+  .grid{gap:5px}
+  .tile .n{font-size:22px}
+  .tile .w{font-size:11px}
+  .tile.tricky::after{width:7px;height:7px;top:4px;right:4px}
+  .opts{grid-template-columns:1fr}
+  .opts.four{grid-template-columns:repeat(2,1fr)}
+  .panel{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Ordinal numbers &amp; dates</h1>
+    <p>Super Minds 3 · Yo Yo English</p>
+  </header>
+
+  <section class="hero">
+    <div class="cal">
+      <div class="rings" aria-hidden="true"><span></span><span></span></div>
+      <div class="page" id="page">
+        <div class="page-head" id="pMonth">October</div>
+        <div class="page-day" id="pDay">6<sup>th</sup></div>
+        <div class="page-say" id="pSay">the sixth of October</div>
+      </div>
+      <div class="cal-btns">
+        <button class="btn say" id="pSpeak">Listen</button>
+        <button class="btn primary" id="pNext">Next page</button>
+      </div>
+    </div>
+
+    <div class="how">
+      <h2>How to write and say a date</h2>
+      <dl class="pair">
+        <dt>We write</dt><dd>6th October</dd>
+        <dt>We say</dt><dd>the sixth of October <small>или</small> October the sixth</dd>
+      </dl>
+      <p>My birthday is <b>on</b> the sixth of October. — Мой день рождения шестого октября.</p>
+      <div class="ends" aria-label="Endings">
+        <span>1<b>st</b></span><span>2<b>nd</b></span><span>3<b>rd</b></span><span>4<b>th</b>…20<b>th</b></span><span>21<b>st</b></span><span>22<b>nd</b></span><span>23<b>rd</b></span><span>31<b>st</b></span>
+      </div>
+      <div class="months" id="months" aria-label="Months — tap to listen"></div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-mode="cards" aria-selected="true">Cards</button>
+    <button role="tab" data-mode="endings" aria-selected="false">Endings</button>
+    <button role="tab" data-mode="spell" aria-selected="false">Spell it</button>
+    <button role="tab" data-mode="read" aria-selected="false">Read the date</button>
+    <button role="tab" data-mode="listen" aria-selected="false">Listen</button>
+  </nav>
+
+  <main class="panel" id="panel" role="tabpanel"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const ORD=[null,"first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth","twentieth"];
+const CARD=[null,"one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
+for(let n=21;n<=29;n++){ORD[n]="twenty-"+ORD[n-20];CARD[n]="twenty-"+CARD[n-20];}
+ORD[30]="thirtieth";CARD[30]="thirty";ORD[31]="thirty-first";CARD[31]="thirty-one";
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_IN=[31,28,31,30,31,30,31,31,30,31,30,31];
+const TRICKY=new Set([1,2,3,5,8,9,12,20,30]);
+const ROUND=10;
+
+function suf(n){const t=n%100;if(t>=11&&t<=13)return"th";return({1:"st",2:"nd",3:"rd"})[n%10]||"th";}
+function short(n){return n+suf(n);}
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);}
+function sayDate(d,m){return "the "+ORD[d]+" of "+MONTHS[m];}
+function writeDate(d,m){return short(d)+" "+MONTHS[m];}
+function randDate(){const m=rnd(0,11);return{d:rnd(1,DAYS_IN[m]),m};}
+
+/* speech */
+let voice=null;
+function loadVoice(){
+  if(!("speechSynthesis" in window))return;
+  const vs=speechSynthesis.getVoices();
+  voice=vs.find(v=>v.lang==="en-GB"&&/Daniel|Kate|Serena|Google UK/i.test(v.name))||vs.find(v=>v.lang==="en-GB")||vs.find(v=>/^en/i.test(v.lang))||null;
+}
+if("speechSynthesis" in window){loadVoice();speechSynthesis.onvoiceschanged=loadVoice;}
+function speak(text){
+  if(!("speechSynthesis" in window))return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(voice)u.voice=voice;u.rate=0.85;speechSynthesis.speak(u);}catch(e){}
+}
+
+/* hero calendar */
+const today=new Date();let cur={d:today.getDate(),m:today.getMonth()};
+const page=document.getElementById("page");
+function drawPage(){
+  document.getElementById("pMonth").textContent=MONTHS[cur.m];
+  document.getElementById("pDay").innerHTML=cur.d+"<sup>"+suf(cur.d)+"</sup>";
+  document.getElementById("pSay").textContent=sayDate(cur.d,cur.m);
+}
+drawPage();
+document.getElementById("pSpeak").onclick=()=>speak(sayDate(cur.d,cur.m));
+document.getElementById("pNext").onclick=()=>{
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const go=()=>{cur=randDate();drawPage();page.classList.remove("tear");speak(sayDate(cur.d,cur.m));};
+  if(reduce){go();return;}
+  page.classList.add("tear");setTimeout(go,430);
+};
+const mWrap=document.getElementById("months");
+MONTHS.forEach(m=>{const b=document.createElement("button");b.textContent=m;b.onclick=()=>speak(m);mWrap.appendChild(b);});
+
+/* tabs */
+const panel=document.getElementById("panel");
+const tabs=[...document.querySelectorAll("#tabs button")];
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));show(t.dataset.mode);});
+
+function show(mode){
+  if(mode==="cards")return renderCards();
+  startQuiz(mode);
+}
+
+/* cards */
+function renderCards(){
+  panel.innerHTML=`<p class="hint-ru">Нажми на число — увидишь, как оно пишется, и услышишь, как его сказать.</p>
+  <div class="grid-head"><span class="legend"><i></i>tricky spelling — запомни написание</span>
+  <span><button class="btn" id="openAll">Show all</button> <button class="btn" id="closeAll">Hide all</button></span></div>
+  <div class="grid" id="grid"></div>`;
+  const g=document.getElementById("grid");
+  for(let n=1;n<=31;n++){
+    const b=document.createElement("button");
+    b.className="tile"+(TRICKY.has(n)?" tricky":"");
+    b.setAttribute("aria-label",n+": "+ORD[n]);
+    b.innerHTML=`<span class="n">${n}<sup>${suf(n)}</sup></span><span class="w">${ORD[n]}</span>`;
+    b.onclick=()=>{b.classList.add("open");speak(ORD[n]);};
+    g.appendChild(b);
+  }
+  document.getElementById("openAll").onclick=()=>g.querySelectorAll(".tile").forEach(t=>t.classList.add("open"));
+  document.getElementById("closeAll").onclick=()=>g.querySelectorAll(".tile").forEach(t=>t.classList.remove("open"));
+}
+
+/* question generators */
+function confusable(d){
+  const c=new Set();
+  const swap={13:30,30:13,3:30,1:21,21:1,2:22,22:2,12:20,20:12,11:1,31:21};
+  if(swap[d])c.add(swap[d]);
+  if(d>1)c.add(d-1); if(d<31)c.add(d+1);
+  if(d<=19&&d+10<=31)c.add(d+10); if(d>10)c.add(d-10);
+  c.delete(d); return [...c];
+}
+/* a month that is easy to confuse with m (June/July, March/May…) and has day d */
+function nearMonth(m,d){
+  const near={0:[1,6],1:[0,2],2:[4,3],3:[7,2],4:[2,5],5:[6,4],6:[5,7],7:[3,6],8:[9,7],9:[8,10],10:[11,9],11:[10,0]}[m];
+  const ok=shuffle(near).filter(x=>DAYS_IN[x]>=d);
+  if(ok.length)return ok[0];
+  return shuffle([...Array(12).keys()].filter(x=>x!==m&&DAYS_IN[x]>=d))[0];
+}
+const GEN={
+  endings(){
+    const n=pick([1,2,3,11,12,13,21,22,23,31,rnd(4,10),rnd(14,20),rnd(24,30)]);
+    return{html:`<div class="big">${n}<span class="slot">?</span></div><div class="q">Choose the ending · Выбери окончание</div>`,
+      options:["st","nd","rd","th"],answer:suf(n),four:true,say:ORD[n],reveal:short(n)+" — "+ORD[n]};
+  },
+  read(){
+    const {d,m}=randDate();
+    const right=sayDate(d,m);
+    const wrong=new Set();
+    wrong.add("the "+CARD[d]+" of "+MONTHS[m]);
+    const c=shuffle(confusable(d)).filter(x=>x<=DAYS_IN[m]);
+    if(c[0])wrong.add(sayDate(c[0],m));
+    wrong.add("the "+ORD[d]+" of "+MONTHS[nearMonth(m,d)]);
+    const opts=shuffle([right,...[...wrong].filter(x=>x!==right).slice(0,3)]);
+    return{html:`<div class="big">${writeDate(d,m)}</div><div class="q">How do we say it? · Как это прочитать?</div>`,
+      options:opts,answer:right,say:right};
+  },
+  listen(){
+    const {d,m}=randDate();
+    const right=writeDate(d,m);
+    const pool=shuffle(confusable(d)).filter(x=>x<=DAYS_IN[m]).slice(0,2).map(x=>writeDate(x,m));
+    pool.push(writeDate(d,nearMonth(m,d)));
+    const opts=shuffle([right,...pool.slice(0,3)]);
+    return{html:`<button class="btn primary listen-btn say" id="play">Play the date</button><div class="q" style="margin-top:10px">Listen and choose · Послушай и выбери дату</div>`,
+      options:opts,answer:right,say:sayDate(d,m),autoplay:true,reveal:right+" — "+sayDate(d,m)};
+  }
+};
+
+/* quiz engine */
+let st=null;
+function startQuiz(mode){
+  st={mode,i:0,score:0,used:new Set()};
+  nextQ();
+}
+function header(){
+  return `<div class="qtop"><span>Question ${st.i+1} / ${ROUND}</span><span>Score: ${st.score}</span></div>
+  <div class="bar"><span style="width:${(st.i/ROUND)*100}%"></span></div>`;
+}
+function nextQ(){
+  if(st.i>=ROUND)return finish();
+  if(st.mode==="spell")return spellQ();
+  let q,guard=0;
+  do{q=GEN[st.mode]();guard++;}while(st.used.has(q.answer)&&guard<20);
+  st.used.add(q.answer);
+  panel.innerHTML=header()+`<div class="prompt">${q.html}</div>
+    <div class="opts${q.four?" four":""}" id="opts"></div>
+    <div class="feedback" id="fb" aria-live="polite"></div><div class="next-row" id="nr"></div>`;
+  const box=document.getElementById("opts");
+  q.options.forEach(o=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=()=>answer(b,o,q);box.appendChild(b);
+  });
+  const play=document.getElementById("play");
+  if(play){play.onclick=()=>speak(q.say);if(q.autoplay)setTimeout(()=>speak(q.say),250);}
+}
+function answer(btn,o,q){
+  const all=[...document.querySelectorAll(".opt")];
+  all.forEach(b=>{b.disabled=true;if(b.textContent===q.answer)b.classList.add("ok");});
+  const fb=document.getElementById("fb");
+  if(o===q.answer){st.score++;fb.className="feedback ok";fb.textContent="Well done! "+(q.reveal||q.answer);}
+  else{btn.classList.add("no");fb.className="feedback no";fb.textContent="Correct answer: "+(q.reveal||q.answer);}
+  speak(q.say);
+  addNext();
+}
+function addNext(){
+  const nr=document.getElementById("nr");
+  const b=document.createElement("button");b.className="btn primary";
+  b.textContent=st.i+1>=ROUND?"See my score":"Next question";
+  b.onclick=()=>{st.i++;nextQ();};nr.appendChild(b);setTimeout(()=>b.focus(),0);
+}
+
+/* spell */
+function norm(s){return s.toLowerCase().trim().replace(/[\s\-–]+/g,"-");}
+function spellQ(){
+  let n,guard=0;
+  do{n=Math.random()<0.55?pick([...TRICKY]):rnd(1,31);guard++;}while(st.used.has(n)&&guard<30);
+  st.used.add(n);
+  panel.innerHTML=header()+`<div class="prompt"><div class="big">${short(n)}</div><div class="q">Write it in words · Напиши словом</div></div>
+    <div class="spell"><input id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Write the word">
+    <button class="btn primary" id="chk">Check</button><button class="btn say" id="hear">Listen</button></div>
+    <div class="feedback" id="fb" aria-live="polite"></div><div class="next-row" id="nr"></div>`;
+  const inp=document.getElementById("inp");inp.focus();
+  const check=()=>{
+    if(!inp.value.trim()){inp.focus();return;}
+    inp.disabled=true;document.getElementById("chk").disabled=true;
+    const fb=document.getElementById("fb");
+    if(norm(inp.value)===ORD[n]){st.score++;inp.classList.add("ok");fb.className="feedback ok";fb.textContent="Well done! "+ORD[n];}
+    else{inp.classList.add("no");fb.className="feedback no";fb.textContent="Correct spelling: "+ORD[n];}
+    speak(ORD[n]);addNext();
+  };
+  document.getElementById("chk").onclick=check;
+  inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();check();}};
+  document.getElementById("hear").onclick=()=>speak(ORD[n]);
+}
+
+function finish(){
+  const s=st.score,stars=s>=9?3:s>=6?2:s>=3?1:0;
+  panel.innerHTML=`<div class="result"><div class="score">${s} / ${ROUND}</div>
+  <div class="stars" aria-label="${stars} stars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
+  <button class="btn primary" id="again">Play again</button></div>`;
+  document.getElementById("again").onclick=()=>startQuiz(st.mode);
+}
+
+renderCards();
+})();
+</script>
+</body>
+</html>
