@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SM3 · Picnic food and tastes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#1f2a44; --muted:#5b6478;
+  --teal:#0e8c8c; --teal-ink:#ffffff;
+  --yellow:#ffd23f; --yellow-ink:#1f2a44;
+  --pink:#f9d3da; --pink-line:#f2b3bf;
+  --card:#ffffff; --line:#e3e6ee;
+  --ok:#1f9d55; --ok-bg:#e3f6ea; --bad:#d64545; --bad-bg:#fde8e8;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141a26; --ink:#eef1f7; --muted:#a8b0c2;
+    --teal:#1fb3b3; --teal-ink:#0b1a1a;
+    --yellow:#ffd23f; --yellow-ink:#1f2a44;
+    --pink:#3a2a31; --pink-line:#4d3540;
+    --card:#1c2333; --line:#2c3549;
+    --ok:#4ad08a; --ok-bg:#163326; --bad:#ff7a7a; --bad-bg:#3a1f22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141a26; --ink:#eef1f7; --muted:#a8b0c2;
+  --teal:#1fb3b3; --teal-ink:#0b1a1a;
+  --pink:#3a2a31; --pink-line:#4d3540;
+  --card:#1c2333; --line:#2c3549;
+  --ok:#4ad08a; --ok-bg:#163326; --bad:#ff7a7a; --bad-bg:#3a1f22;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+
+/* gingham blanket strip = the picnic */
+.blanket{
+  height:22px;
+  background-color:var(--pink);
+  background-image:
+    linear-gradient(90deg,var(--pink-line) 50%,transparent 50%),
+    linear-gradient(var(--pink-line) 50%,transparent 50%);
+  background-size:22px 22px;
+  opacity:.9;
+}
+header{max-width:960px;margin:0 auto;padding:20px 16px 8px}
+h1{font-family:"Baloo 2","Nunito",sans-serif;font-weight:800;font-size:clamp(28px,6vw,42px);line-height:1.05;margin:0 0 4px}
+.sub{color:var(--muted);margin:0}
+nav{display:flex;gap:8px;flex-wrap:wrap;max-width:960px;margin:12px auto 0;padding:0 16px}
+nav button{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-weight:800}
+nav button[aria-selected="true"]{background:var(--yellow);color:var(--yellow-ink);border-color:var(--yellow)}
+main{max-width:960px;margin:0 auto;padding:16px 16px 48px}
+section[hidden]{display:none}
+.hint{color:var(--muted);margin:0 0 14px}
+
+/* flashcards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.group-title{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:22px;margin:22px 0 10px}
+.flip{perspective:900px;height:260px}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.flip.on .flip-inner{transform:rotateY(180deg)}
+@media (prefers-reduced-motion:reduce){.flip-inner{transition:none}}
+.face{position:absolute;inset:0;overflow-y:auto;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;border:2px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}
+.face.back{transform:rotateY(180deg);border-color:var(--teal);padding-top:54px}
+.emoji{font-size:64px;line-height:1}
+.word{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:26px;margin-top:6px;background:var(--yellow);color:var(--yellow-ink);padding:0 12px;border-radius:8px}
+.expl{font-size:16px;font-weight:700}
+.tap{position:absolute;bottom:8px;font-size:13px;color:var(--muted)}
+.icon-btn{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:18px;display:grid;place-items:center}
+.ru-btn{position:absolute;top:8px;left:8px;width:40px;height:40px;border-radius:50%;border:none;background:var(--teal);color:var(--teal-ink);font-weight:800;font-size:14px}
+.ru{margin-top:8px;color:var(--teal);min-height:1.5em;font-size:15px;line-height:1.35}
+.ru b{display:block;font-weight:800;font-size:16px}
+.ru-ex{display:block;font-weight:700;margin-top:2px}
+
+/* match */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col{display:flex;flex-direction:column;gap:10px}
+.tile{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:10px;min-height:58px;font-weight:800;font-size:18px}
+.tile.pic{font-size:34px;line-height:1}
+.tile.sel{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal) inset}
+.tile.done{opacity:.35;pointer-events:none;border-color:var(--ok)}
+.tile.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* quiz shared */
+.panel{border:2px solid var(--line);border-radius:20px;background:var(--card);padding:18px;max-width:640px}
+.progress{font-weight:800;color:var(--muted);margin-bottom:8px}
+.big{font-size:84px;text-align:center;line-height:1.1}
+.qword{text-align:center;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:28px}
+.question{text-align:center;font-weight:800;font-size:20px;margin:6px 0 14px}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.opt{border:2px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 8px;font-weight:800;font-size:19px}
+.opt.pic{font-size:44px;line-height:1}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:12px;font-weight:700;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--ok-bg)}
+.feedback.no{background:var(--bad-bg)}
+.feedback .en{display:block;margin-top:4px;color:var(--muted);font-weight:800}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.main-btn{border:none;background:var(--teal);color:var(--teal-ink);border-radius:999px;padding:10px 20px;font-weight:800}
+.soft-btn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-weight:800}
+.play{display:block;margin:6px auto 14px;width:96px;height:96px;border-radius:50%;border:none;background:var(--yellow);color:var(--yellow-ink);font-size:40px}
+.score{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:30px}
+/* spelling */
+.slots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:6px 0 16px}
+.slot{width:38px;height:46px;border-bottom:3px solid var(--muted);display:grid;place-items:center;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:28px}
+.slot.gap{border:none;width:18px}
+.slot.filled{border-color:var(--teal);color:var(--teal)}
+.letters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.letter{width:50px;height:54px;border-radius:12px;border:2px solid var(--line);background:var(--bg);font-family:"Baloo 2",sans-serif;font-weight:800;font-size:28px}
+.letter.used{visibility:hidden}
+.letter.bad{background:var(--bad-bg);border-color:var(--bad);animation:shake .3s}
+.show-word{text-align:center;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:40px;letter-spacing:2px;min-height:60px}
+.show-word.hidden-word{color:transparent;text-shadow:none;background:repeating-linear-gradient(45deg,var(--pink),var(--pink) 10px,var(--pink-line) 10px,var(--pink-line) 20px);border-radius:12px}
+.type{display:block;width:100%;max-width:360px;margin:0 auto;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:30px;text-align:center;padding:8px;border:3px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+.type:focus{outline:none;border-color:var(--teal)}
+.diff{font-family:"Baloo 2",sans-serif;font-size:30px;letter-spacing:2px;margin-top:4px}
+.diff .x{color:var(--bad);text-decoration:underline}
+.center{justify-content:center}
+</style>
+</head>
+<body>
+<div class="blanket" aria-hidden="true"></div>
+<header>
+  <h1>Picnic food and tastes</h1>
+  <p class="sub">Super Minds 3 · food words and how they taste</p>
+</header>
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-tab="cards">Cards</button>
+  <button role="tab" aria-selected="false" data-tab="match">Match</button>
+  <button role="tab" aria-selected="false" data-tab="build">Build</button>
+  <button role="tab" aria-selected="false" data-tab="write">Write</button>
+  <button role="tab" aria-selected="false" data-tab="taste">Tastes</button>
+</nav>
+<main>
+  <section id="cards">
+    <p class="hint">Tap a card to turn it over. 🔊 — listen, RU — перевод.</p>
+    <h2 class="group-title">Food and drinks</h2>
+    <div class="grid" id="foodGrid"></div>
+    <h2 class="group-title">Tastes</h2>
+    <div class="grid" id="tasteGrid"></div>
+    <h2 class="group-title">More food for tastes</h2>
+    <div class="grid" id="extraGrid"></div>
+  </section>
+
+  <section id="match" hidden>
+    <p class="hint">Tap a word, then tap its picture.</p>
+    <div class="match"><div class="col" id="mWords"></div><div class="col" id="mPics"></div></div>
+    <div class="feedback" id="mFb"></div>
+    <div class="row"><button class="soft-btn" id="mRestart">Start again</button></div>
+  </section>
+
+  <section id="build" hidden>
+    <p class="hint">Listen, look at the picture and build the word from letters.</p>
+    <div class="panel" id="bPanel"></div>
+  </section>
+
+  <section id="write" hidden>
+    <p class="hint">Look at the word. Say it. Hide it. Write it. Check it.</p>
+    <div class="panel" id="wPanel"></div>
+  </section>
+
+  <section id="taste" hidden>
+    <div class="panel" id="tPanel"></div>
+  </section>
+</main>
+
+<script>
+const FOOD=[
+ {en:"apple juice",e:"🧃",ex:"A drink from a red or green fruit that grows on trees.",ru:"яблочный сок",rx:"Напиток из красного или зелёного фрукта, который растёт на деревьях."},
+ {en:"rolls",e:"🥖",ex:"Small pieces of bread, one for each person.",ru:"булочки",rx:"Маленькие кусочки хлеба, по одному на каждого человека."},
+ {en:"cheese",e:"🧀",ex:"Yellow or white food made from milk. Mice love it!",ru:"сыр",rx:"Жёлтая или белая еда из молока. Мыши его обожают!"},
+ {en:"water",e:"💧",ex:"A clear drink. We drink it when we are thirsty.",ru:"вода",rx:"Прозрачный напиток. Мы пьём его, когда хотим пить."},
+ {en:"soup",e:"🍲",ex:"Hot food in a bowl. You eat it with a spoon.",ru:"суп",rx:"Горячая еда в тарелке. Её едят ложкой."},
+ {en:"vegetables",e:"🥕🥦",ex:"Carrots, peas and potatoes. They are good for you.",ru:"овощи",rx:"Морковь, горох и картофель. Они полезные."},
+ {en:"lemonade",e:"🍋🥤",ex:"A cold drink made from a yellow fruit. It's sweet and sour.",ru:"лимонад",rx:"Холодный напиток из жёлтого фрукта. Он сладкий и кислый."},
+ {en:"salad",e:"🥗",ex:"Cold food: tomatoes, cucumbers and green leaves in a bowl.",ru:"салат",rx:"Холодная еда: помидоры, огурцы и зелёные листья в миске."}
+];
+const TASTES=[
+ {en:"sweet",e:"🍬",ex:"Sugar, honey and cake taste like this.",ru:"сладкий",rx:"Такой вкус у сахара, мёда и торта."},
+ {en:"sour",e:"🍋",ex:"Lemons taste like this. Your face goes funny!",ru:"кислый",rx:"Такой вкус у лимона. Лицо смешно морщится!"},
+ {en:"bitter",e:"☕",ex:"Coffee and medicine taste like this. Many children don't like it.",ru:"горький",rx:"Такой вкус у кофе и лекарства. Многим детям он не нравится."},
+ {en:"salty",e:"🧂",ex:"Chips and sea water taste like this.",ru:"солёный",rx:"Такой вкус у картошки фри и морской воды."},
+ {en:"spicy",e:"🌶️",ex:"Chilli peppers taste like this. Your mouth feels hot!",ru:"острый",rx:"Такой вкус у перца чили. Во рту становится горячо!"}
+];
+const EXTRA=[
+ {en:"lemon",e:"🍋",ex:"A yellow fruit. It is very sour.",ru:"лимон",rx:"Жёлтый фрукт. Он очень кислый."},
+ {en:"banana",e:"🍌",ex:"A long yellow fruit. Monkeys love it!",ru:"банан",rx:"Длинный жёлтый фрукт. Обезьяны его обожают!"},
+ {en:"coffee",e:"☕",ex:"A hot brown drink. Many grown-ups drink it in the morning.",ru:"кофе",rx:"Горячий коричневый напиток. Многие взрослые пьют его по утрам."},
+ {en:"medicine",e:"💊",ex:"You take it when you are ill. It helps you get better.",ru:"лекарство",rx:"Его принимают, когда болеют. Оно помогает выздороветь."},
+ {en:"chilli pepper",e:"🌶️",ex:"A small red or green vegetable. It makes your mouth hot!",ru:"перец чили",rx:"Маленький красный или зелёный овощ. От него во рту становится горячо!"},
+ {en:"chips",e:"🍟",ex:"Long hot pieces of potato. You often eat them with ketchup.",ru:"картошка фри",rx:"Длинные горячие кусочки картошки. Их часто едят с кетчупом."},
+ {en:"ice cream",e:"🍦",ex:"A very cold sweet food. It melts in the sun.",ru:"мороженое",rx:"Очень холодная сладкая еда. Она тает на солнце."}
+];
+const TASTE_Q=[
+ {en:"apple juice",e:"🧃",a:["sweet"],s:"Apple juice is sweet.",ru:"Яблочный сок сладкий."},
+ {en:"cheese",e:"🧀",a:["salty"],s:"Cheese is salty.",ru:"Сыр солёный."},
+ {en:"lemon",e:"🍋",a:["sour"],s:"Lemons are sour.",ru:"Лимоны кислые."},
+ {en:"coffee",e:"☕",a:["bitter"],s:"Coffee is bitter.",ru:"Кофе горький."},
+ {en:"chilli pepper",e:"🌶️",a:["spicy"],s:"Chilli peppers are spicy.",ru:"Перец чили острый."},
+ {en:"soup",e:"🍲",a:["salty"],s:"The soup is salty.",ru:"Суп солёный."},
+ {en:"banana",e:"🍌",a:["sweet"],s:"Bananas are sweet.",ru:"Бананы сладкие."},
+ {en:"medicine",e:"💊",a:["bitter"],s:"Medicine is bitter.",ru:"Лекарство горькое."},
+ {en:"lemonade",e:"🍋🥤",a:["sweet","sour"],s:"Lemonade is sweet and sour.",ru:"Лимонад и сладкий, и кислый — тут подходят оба ответа."},
+ {en:"chips",e:"🍟",a:["salty"],s:"Chips are salty.",ru:"Картошка фри (chips) солёная."},
+ {en:"ice cream",e:"🍦",a:["sweet"],s:"Ice cream is sweet.",ru:"Мороженое сладкое."}
+];
+const TASTE_RU={sweet:"сладкий",sour:"кислый",bitter:"горький",salty:"солёный",spicy:"острый"};
+
+/* speech */
+let voice=null;
+function pickVoice(){
+  const v=speechSynthesis.getVoices();
+  voice=v.find(x=>x.lang==="en-GB")||v.find(x=>x.lang&&x.lang.startsWith("en"))||null;
+}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function say(t){
+  if(!("speechSynthesis" in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="en-GB"; if(voice)u.voice=voice; u.rate=.85;
+  speechSynthesis.speak(u);
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const el=(tag,cls,html)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(html!==undefined)n.innerHTML=html;return n};
+
+/* tabs */
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("main section").forEach(s=>s.hidden=s.id!==b.dataset.tab);
+}));
+
+/* cards */
+function makeCard(it){
+  const f=el("div","flip");
+  f.innerHTML=`<div class="flip-inner">
+    <div class="face front"><button class="icon-btn" aria-label="Listen">🔊</button>
+      <div class="emoji">${it.e}</div><div class="word">${it.en}</div><div class="tap">tap to turn</div></div>
+    <div class="face back"><button class="ru-btn" aria-label="Russian translation">RU</button><button class="icon-btn" aria-label="Listen">🔊</button>
+      <div class="expl">${it.ex}</div><div class="ru"></div></div></div>`;
+  f.querySelectorAll(".icon-btn").forEach((b,i)=>b.addEventListener("click",ev=>{ev.stopPropagation();say(i===0?it.en:it.en+". "+it.ex)}));
+  const ru=f.querySelector(".ru");
+  f.querySelector(".ru-btn").addEventListener("click",ev=>{ev.stopPropagation();ru.innerHTML=ru.innerHTML?"":`<b>${it.en} — ${it.ru}</b><span class="ru-ex">${it.rx}</span>`});
+  f.addEventListener("click",()=>{f.classList.toggle("on");if(f.classList.contains("on"))say(it.en)});
+  return f;
+}
+FOOD.forEach(i=>document.getElementById("foodGrid").appendChild(makeCard(i)));
+TASTES.forEach(i=>document.getElementById("tasteGrid").appendChild(makeCard(i)));
+EXTRA.forEach(i=>document.getElementById("extraGrid").appendChild(makeCard(i)));
+
+/* match */
+let mSel=null,mLeft=0;
+function startMatch(){
+  const W=document.getElementById("mWords"),P=document.getElementById("mPics"),fb=document.getElementById("mFb");
+  W.innerHTML="";P.innerHTML="";fb.className="feedback";mSel=null;mLeft=FOOD.length;
+  shuffle(FOOD).forEach(it=>{const b=el("button","tile",it.en);b.dataset.k=it.en;
+    b.onclick=()=>{W.querySelectorAll(".tile").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");mSel=b;say(it.en)};W.appendChild(b)});
+  shuffle(FOOD).forEach(it=>{const b=el("button","tile pic",it.e);b.dataset.k=it.en;b.setAttribute("aria-label","picture");
+    b.onclick=()=>{
+      if(!mSel){fb.className="feedback show no";fb.textContent="Сначала выбери слово слева, потом картинку.";return}
+      if(mSel.dataset.k===it.en){mSel.classList.add("done");b.classList.add("done");mSel=null;mLeft--;
+        fb.className="feedback show ok";fb.textContent=mLeft?`Верно! ${it.en} — ${it.ru}.`:`Отлично, все пары найдены! Последнее: ${it.en} — ${it.ru}.`;
+      }else{const w=FOOD.find(x=>x.en===mSel.dataset.k);b.classList.add("shake");setTimeout(()=>b.classList.remove("shake"),300);
+        fb.className="feedback show no";fb.textContent=`Не совсем. ${w.en} — это «${w.ru}». Найди такую картинку.`;}
+    };P.appendChild(b)});
+}
+document.getElementById("mRestart").onclick=startMatch;
+startMatch();
+
+
+
+/* spelling words: page words + tastes */
+const SPELL=[...FOOD,...TASTES];
+
+/* build */
+let B={q:[],i:0,pos:0,miss:0,score:0};
+function startBuild(){B={q:shuffle(SPELL),i:0,pos:0,miss:0,score:0};showBuild()}
+function showBuild(){
+  const p=document.getElementById("bPanel");
+  if(B.i>=B.q.length){p.innerHTML=`<div class="score">${B.score} / ${B.q.length}</div><p>${B.score===B.q.length?"Отлично! Все слова собраны без ошибок.":"Хорошо! Слова с ошибками потренируй ещё раз во вкладке Write."}</p><div class="row"><button class="main-btn" id="bAgain">Play again</button></div>`;
+    document.getElementById("bAgain").onclick=startBuild;return}
+  const it=B.q[B.i];B.pos=0;B.miss=0;
+  const target=it.en.replace(/ /g,"");
+  p.innerHTML=`<div class="progress">${B.i+1} / ${B.q.length}</div><div class="big">${it.e}</div>
+   <button class="soft-btn" id="bSay" style="display:block;margin:0 auto 8px">🔊 Listen</button>
+   <div class="slots" id="bSlots"></div><div class="letters" id="bLetters"></div>
+   <div class="feedback" id="bFb"></div><div class="row"><button class="main-btn" id="bNext" hidden>Next</button></div>`;
+  document.getElementById("bSay").onclick=()=>say(it.en);
+  const slots=document.getElementById("bSlots"),box=document.getElementById("bLetters"),fb=document.getElementById("bFb"),nx=document.getElementById("bNext");
+  [...it.en].forEach(ch=>slots.appendChild(el("div",ch===" "?"slot gap":"slot","")));
+  const slotEls=[...slots.querySelectorAll(".slot:not(.gap)")];
+  shuffle([...target]).forEach(ch=>{const b=el("button","letter",ch);b.onclick=()=>{
+    if(ch===target[B.pos]){b.classList.add("used");slotEls[B.pos].textContent=ch;slotEls[B.pos].classList.add("filled");B.pos++;fb.className="feedback";
+      if(B.pos===target.length){if(!B.miss)B.score++;
+        fb.className="feedback show ok";fb.innerHTML=(B.miss?`Собрал! Ошибок по пути: ${B.miss}. Запомни: ${it.en.toUpperCase().split("").join(" ")}`:`Верно, без единой ошибки!`)+` <span class="en">${it.en} — ${it.ru}</span>`;
+        say(it.en);nx.hidden=false;nx.focus()}
+    }else{B.miss++;b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400);
+      fb.className="feedback show no";fb.textContent=`Не та буква. Сейчас нужна ${B.pos+1}-я буква слова. Нажми 🔊 и послушай ещё раз.`}
+  };box.appendChild(b)});
+  nx.onclick=()=>{B.i++;showBuild()};
+  setTimeout(()=>say(it.en),250);
+}
+startBuild();
+
+/* write: look, say, cover, write, check */
+let W={q:[],done:0,total:0,first:0,tried:new Set()};
+function startWrite(){W={q:shuffle(SPELL),done:0,total:SPELL.length,first:0,tried:new Set()};showWrite()}
+function showWrite(){
+  const p=document.getElementById("wPanel");
+  if(!W.q.length){p.innerHTML=`<div class="score">${W.first} / ${W.total}</div><p>Столько слов ты написал правильно с первой попытки. ${W.first===W.total?"Супер!":"Слова с ошибками возвращались, пока ты их не написал верно — молодец, что дошёл до конца!"}</p><div class="row"><button class="main-btn" id="wAgain">Play again</button></div>`;
+    document.getElementById("wAgain").onclick=startWrite;return}
+  const it=W.q[0];
+  p.innerHTML=`<div class="progress">Осталось слов: ${W.q.length}</div><div class="big">${it.e}</div>
+   <div class="show-word" id="wWord">${it.en}</div>
+   <div class="row center"><button class="soft-btn" id="wSay">🔊 Listen</button><button class="main-btn" id="wHide">Hide and write</button></div>
+   <div id="wArea" hidden><input class="type" id="wIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Write the word">
+   <div class="row center"><button class="main-btn" id="wCheck">Check</button></div></div>
+   <div class="feedback" id="wFb"></div><div class="row center"><button class="main-btn" id="wNext" hidden>Next</button></div>`;
+  const word=document.getElementById("wWord"),area=document.getElementById("wArea"),inp=document.getElementById("wIn"),fb=document.getElementById("wFb"),nx=document.getElementById("wNext"),hide=document.getElementById("wHide");
+  document.getElementById("wSay").onclick=()=>say(it.en);
+  hide.onclick=()=>{word.classList.add("hidden-word");word.setAttribute("aria-hidden","true");hide.hidden=true;area.hidden=false;inp.focus()};
+  const check=()=>{
+    const v=inp.value.trim().toLowerCase().replace(/\s+/g," ");if(!v){fb.className="feedback show no";fb.textContent="Сначала напиши слово.";return}
+    inp.disabled=true;document.getElementById("wCheck").disabled=true;word.classList.remove("hidden-word");
+    const firstTry=!W.tried.has(it.en);W.tried.add(it.en);
+    if(v===it.en){W.q.shift();if(firstTry)W.first++;fb.className="feedback show ok";fb.innerHTML=`Верно! ${it.en} — ${it.ru}.`+(firstTry?"":" Теперь ты его запомнил.")}
+    else{const d=[...it.en].map((c,i)=>v[i]===c?c:`<span class="x">${c===" "?"&nbsp;":c}</span>`).join("");
+      W.q.push(W.q.shift());
+      fb.className="feedback show no";fb.innerHTML=`Не совсем. Ты написал «${v.replace(/</g,"&lt;")}». Правильно — посмотри на подчёркнутые буквы:<div class="diff">${d}</div>Это слово вернётся в конце, напишешь ещё раз.`}
+    say(it.en);nx.hidden=false;nx.focus()};
+  document.getElementById("wCheck").onclick=check;
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();check()}});
+  nx.onclick=showWrite;
+  setTimeout(()=>say(it.en),250);
+}
+startWrite();
+
+/* tastes */
+let T={q:[],i:0,score:0};
+function startTaste(){T={q:shuffle(TASTE_Q),i:0,score:0};showTaste()}
+function showTaste(){
+  const p=document.getElementById("tPanel");
+  if(T.i>=T.q.length){p.innerHTML=`<div class="score">${T.score} / ${T.q.length}</div><p>${T.score===T.q.length?"Отлично! Ты знаешь все вкусы.":"Молодец! Посмотри карточки со вкусами и попробуй ещё раз."}</p><div class="row"><button class="main-btn" id="tAgain">Play again</button></div>`;
+    document.getElementById("tAgain").onclick=startTaste;return}
+  const it=T.q[T.i];
+  p.innerHTML=`<div class="progress">${T.i+1} / ${T.q.length}</div><div class="big">${it.e}</div><div class="qword">${it.en}</div>
+   <div class="question">What does it taste like?</div><div class="options" id="tOpts"></div>
+   <div class="feedback" id="tFb"></div><div class="row"><button class="main-btn" id="tNext" hidden>Next</button></div>`;
+  const box=document.getElementById("tOpts"),fb=document.getElementById("tFb"),nx=document.getElementById("tNext");
+  TASTES.forEach(t=>{const b=el("button","opt",t.en);b.onclick=()=>{
+    const ok=it.a.includes(t.en);
+    box.querySelectorAll("button").forEach(x=>{x.disabled=true;if(it.a.includes(x.textContent))x.classList.add("right");else if(x===b)x.classList.add("wrong")});
+    if(ok){T.score++;fb.className="feedback show ok";fb.innerHTML=`Верно! ${it.ru}<span class="en">${it.s}</span>`}
+    else{fb.className="feedback show no";fb.innerHTML=`Не совсем: ${t.en} — это «${TASTE_RU[t.en]}». ${it.ru}<span class="en">${it.s}</span>`}
+    say(it.s);nx.hidden=false;nx.focus()};box.appendChild(b)});
+  nx.onclick=()=>{T.i++;showTaste()};
+}
+startTaste();
+</script>
+</body>
+</html>
