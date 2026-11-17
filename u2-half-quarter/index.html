@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Minds 3 — Clock Trainer</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Comic Sans MS", "Trebuchet MS", Arial, sans-serif; background: linear-gradient(#e0f2fe, #fef9c3); color: #1e293b; min-height: 100vh; }
+  header { text-align: center; padding: 16px 10px 6px; }
+  h1 { margin: 0; color: #1e3a8a; font-size: 32px; }
+  h1 span { color: #ef4444; }
+  .tabs { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+  .tab { border: none; border-radius: 30px; padding: 12px 20px; font: inherit; font-size: 18px; font-weight: bold; cursor: pointer; background: #fff; color: #1e3a8a; box-shadow: 0 3px 0 #94a3b8; }
+  .tab.active { background: #2563eb; color: #fff; box-shadow: 0 3px 0 #1e3a8a; }
+  section { display: none; max-width: 900px; margin: 0 auto; padding: 10px 16px 30px; }
+  section.active { display: block; }
+  .panel { background: #fff; border-radius: 24px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.08); display: flex; gap: 24px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .clockbox { width: 340px; max-width: 90vw; }
+  svg.clock { width: 100%; height: auto; touch-action: none; user-select: none; }
+  .side { flex: 1; min-width: 260px; text-align: center; }
+  .hint { font-size: 17px; color: #475569; margin-bottom: 10px; }
+  .digital { font-size: 44px; font-weight: bold; color: #0f172a; letter-spacing: 2px; }
+  .phrase { font-size: 30px; font-weight: bold; margin: 8px 0; }
+  .phrase .p { color: #ef4444; } .phrase .t { color: #2563eb; } .phrase .o { color: #16a34a; } .phrase .h { color: #b45309; }
+  .ru { font-size: 19px; color: #334155; }
+  .btn { border: none; border-radius: 16px; padding: 12px 22px; font: inherit; font-size: 20px; font-weight: bold; cursor: pointer; margin: 6px; color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .b-say { background: #16a34a; } .b-blue { background: #2563eb; } .b-gray { background: #64748b; } .b-orange { background: #f59e0b; }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .opt { border: 3px solid #cbd5e1; background: #f8fafc; border-radius: 16px; padding: 14px 8px; font: inherit; font-size: 20px; font-weight: bold; cursor: pointer; color: #1e293b; }
+  .opt.ok { background: #dcfce7; border-color: #16a34a; }
+  .opt.bad { background: #fee2e2; border-color: #ef4444; }
+  .feedback { font-size: 26px; font-weight: bold; min-height: 36px; margin-top: 10px; }
+  .score { font-size: 18px; color: #475569; margin-top: 6px; }
+  .task { font-size: 30px; font-weight: bold; color: #1e3a8a; margin: 6px 0 4px; }
+  .legend { font-size: 16px; color: #475569; margin-top: 8px; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; }
+  .pbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .pb { border: none; border-radius: 14px; padding: 12px 6px; font: inherit; font-size: 19px; font-weight: bold; cursor: pointer; color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  .pb[data-m="0"] { background: #16a34a; } .pb[data-m="15"] { background: #ef4444; }
+  .pb[data-m="30"] { background: #f59e0b; } .pb[data-m="45"] { background: #2563eb; }
+  .pb:disabled, #playHour:disabled { opacity: .5; cursor: default; }
+  .frac { font-size: 40px; font-weight: bold; min-height: 54px; margin-top: 6px; }
+  .frac .big { font-size: 46px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🕐 What <span>time</span> is it?</h1>
+  <div class="tabs">
+    <button class="tab active" data-s="s0">🍕 1. Пицца-часы</button>
+    <button class="tab" data-s="s1">2. Двигай стрелки</button>
+    <button class="tab" data-s="s2">3. Который час?</button>
+  </div>
+</header>
+
+<!-- 0. Pizza -->
+<section id="s0" class="active">
+  <div class="panel">
+    <div class="clockbox"><svg class="clock" id="pizza" viewBox="0 0 300 300"></svg></div>
+    <div class="side">
+      <div class="hint">Час — это целая пицца 🍕 Нажимай!</div>
+      <div class="pbtns">
+        <button class="pb" data-m="0">o'clock</button>
+        <button class="pb" data-m="15">quarter past</button>
+        <button class="pb" data-m="30">half past</button>
+        <button class="pb" data-m="45">quarter to</button>
+      </div>
+      <div class="frac" id="frac">🍕</div>
+      <div class="phrase" id="php"></div>
+      <div class="ru" id="pru">Выбери кнопку — стрелка побежит!</div>
+      <button class="btn b-orange" id="playHour">▶ Весь час подряд</button>
+    </div>
+  </div>
+</section>
+
+<!-- 1. Explore -->
+<section id="s1">
+  <div class="panel">
+    <div class="clockbox"><svg class="clock" id="clock1" viewBox="0 0 300 300"></svg></div>
+    <div class="side">
+      <div class="hint">👆 Тяни <b style="color:#ef4444">красную</b> или <b style="color:#2563eb">синюю</b> стрелку</div>
+      <div class="digital" id="dig1">8:00</div>
+      <div class="phrase" id="ph1"></div>
+      <div class="ru" id="ru1"></div>
+      <div style="margin-top:12px">
+        <button class="btn b-say" id="say1">🔊 Послушать</button>
+      </div>
+      <label class="legend"><input type="checkbox" id="auto1" checked> озвучивать сразу</label>
+      <div class="legend"><span class="dot" style="background:#ef4444"></span> длинная — минуты &nbsp; <span class="dot" style="background:#2563eb"></span> короткая — часы</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Quiz -->
+<section id="s2">
+  <div class="panel">
+    <div class="clockbox"><svg class="clock" id="clock2" viewBox="0 0 300 300"></svg></div>
+    <div class="side">
+      <div class="task">What time is it?</div>
+      <div class="opts" id="opts2"></div>
+      <div class="feedback" id="fb2"></div>
+      <button class="btn b-blue" id="next2">Дальше ➜</button>
+      <div class="score" id="sc2"></div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const WORDS = ["twelve","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"];
+const RU_GEN = ["двенадцати","часа","двух","трёх","четырёх","пяти","шести","семи","восьми","девяти","десяти","одиннадцати","двенадцати"];
+const RU_NOM = ["двенадцать","час","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать"];
+const RU_ORD = ["двенадцатого","первого","второго","третьего","четвёртого","пятого","шестого","седьмого","восьмого","девятого","десятого","одиннадцатого","двенадцатого"];
+const hw = h => WORDS[((h - 1) % 12 + 12) % 12 + 1];
+const hn = h => ((h - 1) % 12 + 12) % 12 + 1;
+
+function phrase(h, m) {
+  const H = hn(h), N = hn(h + 1);
+  if (m === 0)  return { en: `${hw(H)} o'clock`, html: `${hw(H)} <span class="o">o'clock</span>`, ru: H===1 ? "час ровно" : `${RU_NOM[H]} ${H<5?"часа":"часов"} ровно` };
+  if (m === 15) return { en: `quarter past ${hw(H)}`, html: `quarter <span class="p">past</span> ${hw(H)}`, ru: `четверть после ${RU_GEN[H]} = четверть ${RU_ORD[N]}` };
+  if (m === 30) return { en: `half past ${hw(H)}`, html: `<span class="h">half</span> <span class="p">past</span> ${hw(H)}`, ru: `половина после ${RU_GEN[H]} = половина ${RU_ORD[N]}` };
+  return { en: `quarter to ${hw(N)}`, html: `quarter <span class="t">to</span> ${hw(N)}`, ru: `четверть до ${RU_GEN[N]} = без четверти ${RU_NOM[N]}` };
+}
+const digital = (h, m) => `${hn(h)}:${String(m).padStart(2, "0")}`;
+
+// ---------- speech ----------
+let voice = null;
+function pickVoice() {
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => v.lang === "en-GB") || vs.find(v => v.lang && v.lang.startsWith("en")) || null;
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function say(text) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB"; if (voice) u.voice = voice; u.rate = 0.85;
+  speechSynthesis.speak(u);
+}
+
+// ---------- clock widget ----------
+function el(p, tag, a) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; }
+function pt(r, deg) { const a = (deg - 90) * Math.PI / 180; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; }
+
+function makeClock(svg, opts) {
+  const C = 150, R = 138;
+  el(svg, "path", { d: `M150,150 L150,12 A138,138 0 0 1 150,288 Z`, fill: "#fee2e2" });
+  el(svg, "path", { d: `M150,150 L150,288 A138,138 0 0 1 150,12 Z`, fill: "#dbeafe" });
+  el(svg, "circle", { cx: C, cy: C, r: R, fill: "none", stroke: "#1e293b", "stroke-width": 8 });
+  for (let i = 0; i < 60; i++) {
+    const [x1, y1] = pt(R - 4, i * 6), [x2, y2] = pt(R - (i % 5 ? 10 : 18), i * 6);
+    el(svg, "line", { x1, y1, x2, y2, stroke: "#1e293b", "stroke-width": i % 5 ? 2 : 4 });
+  }
+  for (let i = 1; i <= 12; i++) {
+    const [x, y] = pt(R * 0.74, i * 30);
+    const t = el(svg, "text", { x, y: y + 9, "font-size": 26, "text-anchor": "middle", "font-weight": "bold", "font-family": "Arial", fill: "#1e293b" });
+    t.textContent = i;
+  }
+  if (opts.labels) {
+    const lab = (x, y, s, c) => { const t = el(svg, "text", { x, y, "font-size": 20, "text-anchor": "middle", "font-weight": "bold", fill: c, "font-family": "Arial", opacity: .55 }); t.textContent = s; };
+    lab(195, 122, "PAST", "#ef4444"); lab(105, 122, "TO", "#2563eb");
+  }
+  const hour = el(svg, "line", { x1: C, y1: C, x2: C, y2: C - 56, stroke: "#2563eb", "stroke-width": 12, "stroke-linecap": "round" });
+  const min  = el(svg, "line", { x1: C, y1: C, x2: C, y2: C - 86, stroke: "#ef4444", "stroke-width": 7, "stroke-linecap": "round" });
+  const knob = el(svg, "circle", { cx: C, cy: C - 86, r: opts.drag ? 11 : 0, fill: "#ef4444" });
+  const hknob = el(svg, "circle", { cx: C, cy: C - 56, r: opts.drag ? 12 : 0, fill: "#2563eb" });
+  el(svg, "circle", { cx: C, cy: C, r: 9, fill: "#1e293b" });
+
+  const st = { h: 8, m: 0 };
+  function draw() {
+    const md = st.m * 6, hd = (hn(st.h) % 12) * 30 + st.m * 0.5;
+    const [mx, my] = pt(86, md), [hx, hy] = pt(56, hd);
+    min.setAttribute("x2", mx); min.setAttribute("y2", my); knob.setAttribute("cx", mx); knob.setAttribute("cy", my);
+    hour.setAttribute("x2", hx); hour.setAttribute("y2", hy); hknob.setAttribute("cx", hx); hknob.setAttribute("cy", hy);
+  }
+  function set(h, m) { st.h = hn(h); st.m = m; draw(); }
+
+  if (opts.drag) {
+    let dragging = null;
+    const angleOf = e => {
+      const r = svg.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * 300 - 150, y = (e.clientY - r.top) / r.height * 300 - 150;
+      return { deg: (Math.atan2(y, x) * 180 / Math.PI + 90 + 360) % 360, dist: Math.hypot(x, y) };
+    };
+    svg.addEventListener("pointerdown", e => {
+      const { dist } = angleOf(e);
+      const r = svg.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * 300, y = (e.clientY - r.top) / r.height * 300;
+      const dMin = Math.hypot(x - +knob.getAttribute("cx"), y - +knob.getAttribute("cy"));
+      const dHr = Math.hypot(x - +hknob.getAttribute("cx"), y - +hknob.getAttribute("cy"));
+      dragging = dist > 72 ? "m" : (dHr < dMin ? "h" : "m");
+      svg.setPointerCapture(e.pointerId);
+      move(e);
+    });
+    const move = e => {
+      if (!dragging) return;
+      const { deg } = angleOf(e);
+      if (dragging === "m") {
+        const nm = (Math.round(deg / 90) * 15) % 60;
+        if (nm !== st.m) {
+          if (st.m === 45 && nm === 0) st.h = hn(st.h + 1);
+          else if (st.m === 0 && nm === 45) st.h = hn(st.h - 1);
+          st.m = nm; draw(); opts.onChange && opts.onChange(st);
+        }
+      } else {
+        const nh = hn(Math.round((deg - st.m * 0.5) / 30));
+        if (nh !== st.h) { st.h = nh; draw(); opts.onChange && opts.onChange(st); }
+      }
+    };
+    svg.addEventListener("pointermove", move);
+    const up = () => { if (dragging) { dragging = null; opts.onRelease && opts.onRelease(st); } };
+    svg.addEventListener("pointerup", up); svg.addEventListener("pointercancel", up);
+  }
+  draw();
+  return { st, set };
+}
+
+// ---------- tabs ----------
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === b));
+  document.querySelectorAll("section").forEach(s => s.classList.toggle("active", s.id === b.dataset.s));
+  speechSynthesis && speechSynthesis.cancel();
+});
+
+// ---------- 1. Explore ----------
+const show1 = st => {
+  const p = phrase(st.h, st.m);
+  document.getElementById("dig1").textContent = digital(st.h, st.m);
+  document.getElementById("ph1").innerHTML = "It's " + p.html + ".";
+  document.getElementById("ru1").textContent = p.ru;
+};
+const c1 = makeClock(document.getElementById("clock1"), {
+  drag: true, labels: true, onChange: show1,
+  onRelease: st => { if (document.getElementById("auto1").checked) say("It's " + phrase(st.h, st.m).en + "."); }
+});
+show1(c1.st);
+document.getElementById("say1").onclick = () => say("It's " + phrase(c1.st.h, c1.st.m).en + ".");
+
+// ---------- helpers ----------
+const MINS = [0, 15, 30, 45];
+const rnd = n => Math.floor(Math.random() * n);
+const randTime = () => ({ h: rnd(12) + 1, m: MINS[rnd(4)] });
+const PRAISE = ["Well done! 🎉", "Great! ⭐", "Super! 🚀", "Excellent! 🏆"];
+
+// ---------- 2. Quiz ----------
+const c2 = makeClock(document.getElementById("clock2"), { drag: false, labels: false });
+let q2 = null, s2 = { ok: 0, all: 0 }, answered2 = false;
+function newQ2() {
+  q2 = randTime(); c2.set(q2.h, q2.m); answered2 = false;
+  document.getElementById("fb2").textContent = "";
+  // distractors: same hour other forms + the classic "to"-trap
+  const set = [q2];
+  const cand = [
+    { h: q2.h, m: (q2.m + 15) % 60 }, { h: q2.h, m: (q2.m + 30) % 60 },
+    { h: q2.h, m: (q2.m + 45) % 60 }, { h: q2.h + 1, m: q2.m }, { h: q2.h - 1, m: q2.m }
+  ];
+  cand.sort(() => Math.random() - .5);
+  for (const c of cand) { if (set.length < 4 && !set.some(s => phrase(s.h, s.m).en === phrase(c.h, c.m).en)) set.push(c); }
+  set.sort(() => Math.random() - .5);
+  const box = document.getElementById("opts2"); box.innerHTML = "";
+  set.forEach(t => {
+    const b = document.createElement("button"); b.className = "opt"; b.textContent = phrase(t.h, t.m).en;
+    b.onclick = () => {
+      say("It's " + phrase(t.h, t.m).en + ".");
+      if (answered2) return;
+      answered2 = true; s2.all++;
+      const good = phrase(t.h, t.m).en === phrase(q2.h, q2.m).en;
+      if (good) { s2.ok++; b.classList.add("ok"); document.getElementById("fb2").textContent = PRAISE[rnd(4)]; }
+      else {
+        b.classList.add("bad");
+        [...box.children].forEach(x => { if (x.textContent === phrase(q2.h, q2.m).en) x.classList.add("ok"); });
+        document.getElementById("fb2").textContent = "Try again next time! 💪";
+      }
+      document.getElementById("sc2").textContent = `Score: ${s2.ok} / ${s2.all}`;
+    };
+    box.appendChild(b);
+  });
+}
+document.getElementById("next2").onclick = newQ2;
+newQ2();
+
+// ---------- 0. Pizza clock ----------
+(function () {
+  const svg = document.getElementById("pizza");
+  const C = 150;
+  const P = (r, d) => pt(r, d);
+  const sector = (a0, a1, r) => {
+    if (a1 - a0 <= 0.01) return "";
+    if (a1 - a0 >= 359.99) return `M${C - r},${C} a${r},${r} 0 1,0 ${2 * r},0 a${r},${r} 0 1,0 ${-2 * r},0`;
+    const [x0, y0] = P(r, a0), [x1, y1] = P(r, a1);
+    return `M${C},${C} L${x0},${y0} A${r},${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1},${y1} Z`;
+  };
+  el(svg, "circle", { cx: C, cy: C, r: 140, fill: "#d97706" });
+  el(svg, "circle", { cx: C, cy: C, r: 124, fill: "#fde68a" });
+  [[60,58],[130,48],[215,60],[300,52],[25,95],[100,98],[165,92],[240,100],[320,96],[200,30],[80,30]]
+    .forEach(([d, r]) => { const [x, y] = P(r, d); el(svg, "circle", { cx: x, cy: y, r: 10, fill: "#dc2626", opacity: .85 }); });
+  const eaten = el(svg, "path", { fill: "#ef4444", opacity: .6 });
+  const left = el(svg, "path", { fill: "#2563eb", opacity: .55 });
+  [0, 90, 180, 270].forEach(d => { const [x, y] = P(124, d); el(svg, "line", { x1: C, y1: C, x2: x, y2: y, stroke: "#92400e", "stroke-width": 3, "stroke-dasharray": "7 5" }); });
+  for (let i = 1; i <= 12; i++) {
+    const [x, y] = P(108, i * 30);
+    const t = el(svg, "text", { x, y: y + 8, "font-size": i % 3 ? 18 : 24, "text-anchor": "middle", "font-weight": "bold", "font-family": "Arial", fill: "#1e293b", stroke: "#fff", "stroke-width": 4, "paint-order": "stroke" });
+    t.textContent = i;
+  }
+  const hour = el(svg, "line", { x1: C, y1: C, x2: C, y2: C, stroke: "#1e3a8a", "stroke-width": 11, "stroke-linecap": "round" });
+  const min = el(svg, "line", { x1: C, y1: C, x2: C, y2: C, stroke: "#7f1d1d", "stroke-width": 7, "stroke-linecap": "round" });
+  el(svg, "circle", { cx: C, cy: C, r: 9, fill: "#1e293b" });
+
+  function render(t, showLeft) {           // t = minutes after 8:00 (0..60)
+    const [mx, my] = P(92, t * 6), [hx, hy] = P(55, 240 + t * 0.5);
+    min.setAttribute("x2", mx); min.setAttribute("y2", my);
+    hour.setAttribute("x2", hx); hour.setAttribute("y2", hy);
+    eaten.setAttribute("d", sector(0, t * 6, 124));
+    eaten.setAttribute("opacity", showLeft ? .22 : .6);
+    left.setAttribute("d", showLeft ? sector(t * 6, 360, 124) : "");
+  }
+  const INFO = {
+    0:  { frac: "🍕 целая", ru: "Ровно восемь. Ещё ничего не съели!" },
+    15: { frac: '<span class="big" style="color:#ef4444">¼</span> = quarter', ru: "Съели ¼ пиццы ➜ прошла четверть часа ПОСЛЕ восьми" },
+    30: { frac: '<span class="big" style="color:#f59e0b">½</span> = half', ru: "Съели ½ пиццы ➜ прошла половина часа ПОСЛЕ восьми" },
+    45: { frac: '<span class="big" style="color:#2563eb">¼</span> осталось', ru: "Осталась ¼ пиццы ➜ четверть часа ДО девяти" },
+    60: { frac: "🍕 новая пицца!", ru: "Пиццу съели — наступило девять. Новый час!" }
+  };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const speak = text => new Promise(res => {
+    if (!("speechSynthesis" in window)) return setTimeout(res, 1500);
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = "en-GB"; if (voice) u.voice = voice; u.rate = 0.85;
+    let done = false; const fin = () => { if (!done) { done = true; res(); } };
+    u.onend = fin; setTimeout(fin, 3500); speechSynthesis.speak(u);
+  });
+  function sweep(from, to, ms) {
+    return new Promise(res => {
+      const t0 = performance.now();
+      const step = now => {
+        const k = Math.min(1, (now - t0) / ms), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        render(from + (to - from) * e, false);
+        k < 1 ? requestAnimationFrame(step) : res();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+  function show(m) {
+    render(m, m === 45);
+    const ph = phrase(m === 60 ? 9 : 8, m === 60 ? 0 : m);
+    document.getElementById("frac").innerHTML = INFO[m].frac;
+    document.getElementById("php").innerHTML = "It's " + ph.html + ".";
+    document.getElementById("pru").textContent = INFO[m].ru;
+    return "It's " + ph.en + ".";
+  }
+  const btns = [...document.querySelectorAll(".pb"), document.getElementById("playHour")];
+  const lock = v => btns.forEach(b => b.disabled = v);
+  let busy = false;
+  document.querySelectorAll(".pb").forEach(b => b.onclick = async () => {
+    if (busy) return; busy = true; lock(true);
+    const m = +b.dataset.m;
+    render(0, false);
+    if (m) await sweep(0, m, 500 + m * 40);
+    say(show(m));
+    busy = false; lock(false);
+  });
+  document.getElementById("playHour").onclick = async () => {
+    if (busy) return; busy = true; lock(true);
+    render(0, false);
+    await speak(show(0));
+    let prev = 0;
+    for (const m of [15, 30, 45, 60]) {
+      await sleep(250);
+      await sweep(prev, m, 1100); prev = m;
+      await speak(show(m));
+    }
+    busy = false; lock(false);
+  };
+  render(0, false);
+})();
+</script>
+</body>
+</html>
